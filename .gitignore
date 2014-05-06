@@ -1,0 +1,28 @@
+################
+# folder #
+################
+/dist/
+/node_modules/
+/resources/
+/tmp/
+/app/bower_components/
+/.idea/
+
+###############
+# fixed file #
+###############
+*.exe
+*.txt
+
+
+###############
+# temp file #
+###############
+*.log
+
+###############
+# file #
+###############
+.bowerrc
+.jshintrc
+
