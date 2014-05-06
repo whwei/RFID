@@ -3,8 +3,7 @@
 /node_modules/
 /resources/
 /tmp/
-
-
+/.idea/
 
 *.log
 *.exe
