@@ -1,0 +1,8 @@
+{
+  "name": "package",
+  "version": "0.0.0",
+  "dependencies": {
+    "fontawesome": "~4.0.3",
+    "mrmrs-colors": "~0.2.0"
+  }
+}

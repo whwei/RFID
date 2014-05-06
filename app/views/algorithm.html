@@ -1,0 +1,15 @@
+<div class="row nav-title">
+  <div class="btn-group">
+    <button class="btn current">算法模拟</button>
+    <button class="btn">统计结果</button>
+  </div>
+</div>
+<div class="row">
+  <div id="result" ng-show="resultReturned">
+      <table>
+          <tr><th>Generation</th><th>Fitness</th></tr>
+          <tr ng-repeat="g in generations track by $index"><td>{{$index + 1}}</td><td>{{g}}</td></tr>
+      </table>
+  </div>
+  <div class="calculating" ng-hide="resultReturned">计算中...</div>
+</div>

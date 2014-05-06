@@ -1,0 +1,16 @@
+.slide.ng-enter {
+	transition: all .3s ease-out;
+}
+
+.slide.ng-enter {
+	-webkit-transform: translate3d(100px, 0, 0);
+	opacity: 0;
+}
+
+.slide.ng-enter-active {
+	transition: all .3s ease-out;
+	-webkit-transform: translate3d(0, 0, 0);
+	opacity: 1;
+}
+
+

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html ng-app="app">
+    <head>
+        <meta charset="UTF-8">
+        <title>RFID network planning simulator</title>
+        <link rel="stylesheet" href="css/animation.css">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.min.css"/>
+    </head>
+    <body ng-controller="appController">
+        <!--<div class="toolbar" ng-controller="windowController">-->
+            <!--<button class="close" ng-click="closeWindow()"><span>&times;</span></button>-->
+            <!--<button class="min" ng-click="hideWindow()"><span>_</span></button>-->
+        <!--</div>-->
+        <div class="layout">
+            <div class="nav-main" ng-controller="navController">
+                <ul class="list-group">
+                  <li ng-repeat="algo in algos">
+                    <a href="{{ algo.url }}" class="list-group-item" ng-class="algo.klass" ng-click="select(algo.url)">{{ algo.title }}</a>
+                  </li>
+                </ul>
+                <div><a href="{{ addAlgo.url }}" class="list-group-item" ng-click="select(addAlgo.url)" ng-class="addAlgo.klass">{{ addAlgo.title }}</a></div>
+            </div>
+            <div class="main-content">
+                <div class="slide" ng-view>
+                </div>
+            </div>
+        </div>
+
+        <script src="js/angular.js"></script>
+        <script src="js/angular-route.js"></script>
+        <script src="js/angular-animate.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/controllers.js"></script>
+
+    </body>
+</html>
+
