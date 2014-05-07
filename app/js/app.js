@@ -23,7 +23,7 @@ app.factory('algorithmInfoFactory', function () {
     ai.algorithmInfo = require('./js/node/algorithmInfo').algorithmInfo;
     ai.algos = ai.algorithmInfo.loadAlgorithmInfo();
     ai.algos.map(function (a, i) {
-        a.url = '#/algorithm/' + a.name;
+        a.url = '#/algorithms/' + a.name;
         a.klass = i === 0 ? 'current' : '';
     });
     ai.refresh = function () {
