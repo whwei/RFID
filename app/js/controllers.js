@@ -47,8 +47,9 @@ appControllers.controller('addController', function ($scope, $routeParams, saver
 
     $scope.bind = bind;
     $scope.submit = function () {
-        if (!$scope.name || !$scope.cName || !$scope.file) {
+        if (!$scope.name || !$scope.file) {
             // alert or ....
+            console.log('no input');
             return;
         }
         var saver = saverFactory.saver,
@@ -70,7 +71,8 @@ appControllers.controller('addController', function ($scope, $routeParams, saver
     bind('holder');
 
     function bind(id) {
-        var holder = document.getElementById(id);
+        var holder = document.getElementById(id),
+            tip = document.querySelector('.tip');
         holder.ondragover = function () { this.className = 'hover'; return false; };
         holder.ondragend = function () { this.className = ''; return false; };
         holder.ondrop = function (e) {
@@ -83,6 +85,8 @@ appControllers.controller('addController', function ($scope, $routeParams, saver
                 $scope.file = event.target.result;
             };
             reader.readAsDataURL(file);
+
+            tip.innerHTML = file.name;
 
             return false;
         };

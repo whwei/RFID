@@ -54,7 +54,7 @@ app.factory('algorithmFactory', function () {
 
 app.config(['$routeProvider', function($routeProvider){
 	$routeProvider
-		.when('/algorithm/:algo', {
+		.when('/algorithms/:algo', {
 			controller: 'algorithmController',
 			templateUrl: 'views/algorithm.html'
 		})
