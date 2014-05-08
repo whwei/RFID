@@ -3,6 +3,8 @@
   "version": "0.0.0",
   "dependencies": {
     "fontawesome": "~4.0.3",
-    "mrmrs-colors": "~0.2.0"
+    "mrmrs-colors": "~0.2.0",
+    "jquery": "~2.1.1",
+    "highcharts-release": "~4.0.1"
   }
 }
