@@ -24,19 +24,121 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
 	$scope.algo = $routeParams.algo;
     $scope.resultReturned = false;
 
+    // tab setting
+    $scope.tabs = {simulate: 'current', result: ''};
+    $scope.panels = {simulate: 'show', result: ''};
+
+    // get worker
     var wk = new Worker('js/algorithms/' + $scope.algo + '-worker.js');
-    wk.addEventListener('message', function (e) {
-        $scope.$apply(function(scope) {
-            scope.generations = e.data.records;
-            scope.resultReturned = true;
-            console.log(e.data.records);
-        });
-    }, false);
 
     wk.postMessage({
-        iterations: 40,
-        m: 20
+        command: 'getDefaultOption'
     });
+
+    // bind worker event
+    wk.addEventListener('message', function (e) {
+        if (e.data.type === 'result'){
+            $scope.$apply(function(scope) {
+                scope.generations = e.data.value.records;
+                scope.resultReturned = true;
+
+                $('#result').highcharts({
+                    chart: {
+                        zoomType: 'x'
+                    },
+                    title: {
+                        text: 'Fitness of each generation'
+                    },
+                    subtitle: {
+                        text: document.ontouchstart === undefined ?
+                            'Click and drag in the plot area to zoom in' :
+                            'Pinch the chart to zoom in'
+                    },
+                    xAxis: {
+                        type: 'linear',
+                        minRange: 1
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Fitness'
+                        },
+                        max: 1,
+                        min: 0
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    plotOptions: {
+                        area: {
+                            fillColor: {
+                                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+                                stops: [
+                                    [0, Highcharts.getOptions().colors[0]],
+                                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                                ]
+                            },
+                            marker: {
+                                radius: 2
+                            },
+                            lineWidth: 1,
+                            states: {
+                                hover: {
+                                    lineWidth: 1
+                                }
+                            },
+                            threshold: null
+                        }
+                    },
+
+                    series: [{
+                        type: 'area',
+                        name: 'Fitness',
+                        pointInterval: 1,
+                        pointStart: 1,
+                        data: e.data.value.records
+                    }]
+                });
+
+                $scope.switchTab('result');
+            });
+        } else if (e.data.type === 'options') {
+            $scope.$apply(function(scope) {
+                var opts = {},
+                    ret = JSON.parse(e.data.value);
+
+                for (var p in ret) {
+                    if (ret.hasOwnProperty(p)) {
+                        if (ret[p].optional === true) {
+                            opts[p] = ret[p];
+                        }
+                    }
+                }
+                scope.options = opts;
+            });
+        }
+
+    }, false);
+
+    $scope.switchTab = function (n) {
+        for (var p in $scope.tabs) {
+            if ($scope.tabs.hasOwnProperty(p)) {
+                $scope.tabs[p] = '';
+                $scope.panels[p] = '';
+            }
+        }
+
+        $scope.tabs[n] = 'current';
+        $scope.panels[n] = 'show';
+    };
+
+
+    $scope.simulate = function () {
+        // run worker
+        wk.postMessage({
+            command: 'run',
+            options: $scope.options
+        });
+    };
 
 });
 

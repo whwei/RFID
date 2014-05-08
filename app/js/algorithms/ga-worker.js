@@ -1,11 +1,22 @@
 "use strict";
 
 self.addEventListener('message', function (e) {
-    var ga = new GA(e.data);
-    ga.init();
-
-   self.postMessage(ga.run());
-
+    switch (e.data.command) {
+        case 'run':
+            var ga = new GA(e.data.options);
+            ga.init();
+            self.postMessage({
+                type: 'result',
+                value: ga.run()
+            });
+            break;
+        case 'getDefaultOption':
+            self.postMessage({
+                type: 'options',
+                value: JSON.stringify(GA.prototype.options)
+            });
+            break;
+    }
 }, false);
 
 
@@ -24,19 +35,78 @@ var GA = function (op) {
 
 GA.prototype = {
     options:  {
-        rn: 10, // reader_number
-        tn: 30, // tag_number
-        size: 30, // working area size
-        r: 5,
-        EIRP: 15,
-        G: 3,
-        lambda: 13.56,
-        Rq: 10,
-        iterations: 200,
-        step: 10,
-        m: 20,
-        pc: 0.7,
-        pm: 0.0001
+        rn: {
+            name: 'rn',
+            desc: '读写器个数',
+            optional: true,
+            value: 10
+        },
+        tn: {
+            name: 'tn',
+            desc: '标签个数',
+            optional: true,
+            value: 30
+        },
+        size: {
+            name: 'size',
+            desc: '工作区大小',
+            optional: true,
+            value: 30
+        },
+        r: {
+            name: 'r',
+            desc: '读写器覆盖范围',
+            optional: true,
+            value: 5
+        },
+        EIRP: {
+            name: 'EIRP',
+            desc: '',
+            optional: false,
+            value: 15
+        },
+        G: {
+            name: 'G',
+            desc: '',
+            optional: false,
+            value: 3
+        },
+        lambda: {
+            name: 'lambda',
+            desc: '',
+            optional: false,
+            value: 13.56
+        },
+        Rq: {
+            name: 'Rq',
+            desc: '',
+            optional: false,
+            value: 10
+        },
+        iterations: {
+            name: 'iterations',
+            desc: '最大代数',
+            optional: true,
+            value: 200
+        },
+        m: {
+            name: 'm',
+            desc: '种群大小',
+            optional: true,
+            value: 20
+        },
+        pc: {
+            name: 'pc',
+            desc: '交叉概率',
+            optional: true,
+            value: 0.7
+        },
+        pm: {
+            name: 'pm',
+            desc: '突变概率',
+            optional: true,
+            value: 0.0001
+        }
     },
     testCM: function () {
         var g1 = [
@@ -56,8 +126,6 @@ GA.prototype = {
 
         mutation(g1, g2);
 
-        console.table(g1);
-        console.table(g2);
     },
     init: function () {
         this.reset();
@@ -66,7 +134,7 @@ GA.prototype = {
             j = 0;
 
         // each tag has a random position
-        for (i = 0; i < this.options.tn; i++) {
+        for (i = 0; i < this.options.tn.value; i++) {
             this.tags.push({
                 x: randomNumber(),
                 y: randomNumber()
@@ -74,9 +142,9 @@ GA.prototype = {
         }
 
         // each reader has a random position
-        for (i = 0; i < this.options.m; i++) {
+        for (i = 0; i < this.options.m.value; i++) {
             this.population[i] = [];
-            for (j = 0; j < this.options.rn; j++) {
+            for (j = 0; j < this.options.rn.value; j++) {
                 this.population[i].push(new Reader(randomNumber(),randomNumber()));
             }
         }
@@ -95,7 +163,7 @@ GA.prototype = {
     },
     run: function(it) {
         var i,
-            len = it || this.options.iterations;
+            len = it || this.options.iterations.value;
         for (i = 0; i < len; i++) {
             this.iterator();
             this.status.iteration = i;
@@ -124,7 +192,6 @@ GA.prototype = {
             }
             sum += s.statistic.fitness;
         });
-
         for (i = 0; i < len; i++) {
             this.population[i].statistic = this.getStatistic(this.population[i], this.tags);
             ac += this.population[i].statistic.fitness / sum;
@@ -142,15 +209,16 @@ GA.prototype = {
                 }
             }
         }
+        
         // cross operation
         var halfLen = len / 2;
         for (i = 0; i < halfLen; i++) {
-            cross(winners[i], winners[i + halfLen], this.options.pc);
+            cross(winners[i], winners[i + halfLen], this.options.pc.value);
         }
 
         // mutation operation
         for (i = 0; i < len; i++) {
-            mutation(winners[i], this.options.pm);
+            mutation(winners[i], this.options.pm.value);
         }
 
         this.population = winners;
@@ -168,7 +236,7 @@ GA.prototype = {
         } else {
             d = distance(reader, tag);
         }
-        return (this.options.lambda * this.options.lambda * this.options.G * this.options.EIRP) / Math.pow(4 * Math.PI * d, 2);
+        return (this.options.lambda.value * this.options.lambda.value * this.options.G.value * this.options.EIRP.value) / Math.pow(4 * Math.PI * d, 2);
     },
     getStatistic: function (readers, tags) {
         var self = this,
@@ -187,13 +255,13 @@ GA.prototype = {
         tags.forEach(function (tag, it) {
             readers.forEach(function (reader, ir) {
                 //coverage
-                coverage += reader.distance[it] <= self.options.r ? 1 : 0;
+                coverage += reader.distance[it] <= self.options.r.value ? 1 : 0;
             });
         });
         results.push({
             object: 'coverage',
             weight: 0.333,
-            value: coverage / this.options.tn
+            value: coverage / this.options.tn.value
         });
 
         // interference
@@ -215,7 +283,7 @@ GA.prototype = {
         results.push({
             object: 'interference',
             weight: 0.333,
-            value: interference / this.options.tn
+            value: interference / this.options.tn.value
         });
 
         // load balance
@@ -224,13 +292,13 @@ GA.prototype = {
         readers.forEach(function (reader, ir) {
             ni = 0;
             tags.forEach(function (tag, it) {
-                if (reader.distance[it] <= self.options.r) {
+                if (reader.distance[it] <= self.options.r.value) {
                     ni++;
                 }
             });
 
             balance += ni !== 0 ?
-                (ni / self.options.tn) * Math.log(ni / self.options.tn) / Math.log(self.options.rn)
+                (ni / self.options.tn.value) * Math.log(ni / self.options.tn.value) / Math.log(self.options.rn.value)
                 :
                 0;
 
@@ -274,7 +342,7 @@ function distance(p1, p2) {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     }
     function check(n) {
-        return n >= 0 && n <= GA.prototype.options.size;
+        return n >= 0 && n <= GA.prototype.options.size.value;
     }
 
     return null;
@@ -282,14 +350,14 @@ function distance(p1, p2) {
 
 function randomNumber(min, max) {
     min = min || 0;
-    max = max || GA.prototype.options.size;
+    max = max || GA.prototype.options.size.value;
     return (Math.random() * (max - min) + min).toFixed(3);
 }
 
 function cross(g1, g2, pc) {
     var i,
         temp,
-        len = g1.length;
+        len = g1 && g1.length;
 
     for (i = 0; i < len; i++) {
         if (Math.random() <= pc) {
@@ -303,7 +371,7 @@ function cross(g1, g2, pc) {
 
 function mutation(g, pm) {
     var i,
-        len = g.length;
+        len = g && g.length;
 
     for (i = 0; i < len; i++) {
         if (Math.random() <= pm) {
