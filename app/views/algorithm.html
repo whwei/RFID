@@ -1,15 +1,32 @@
+
 <div class="row nav-title">
   <div class="btn-group">
-    <button class="btn current">算法模拟</button>
-    <button class="btn">统计结果</button>
+    <button class="btn" ng-class="tabs.simulate" ng-click="switchTab('simulate')">算法模拟</button>
+    <button class="btn" ng-class="tabs.result" ng-click="switchTab('result')">统计结果</button>
   </div>
 </div>
-<div class="row">
-  <div id="result" ng-show="resultReturned">
-      <table>
-          <tr><th>Generation</th><th>Fitness</th></tr>
-          <tr ng-repeat="g in generations track by $index"><td>{{$index + 1}}</td><td>{{g}}</td></tr>
-      </table>
-  </div>
-  <div class="calculating" ng-hide="resultReturned">计算中...</div>
+<div class="animate-switch-container panels">
+    <div class="simulate animate-switch" ng-class="panels.simulate">
+        <fieldset>
+            <legend>模拟参数</legend>
+            <div ng-repeat="option in options">
+                <label for="{{option.name}}">{{option.desc}}</label><input type="text" id="{{option.name}}" ng-model="option.value" />
+            </div>
+            <!--<div><label for="rn">读写器数量</label><input type="text" id="rn" ng-model="options.rn"/></div>-->
+            <!--<div><label for="tn">标签数量</label><input type="text" id="tn" ng-model="options.tn"/></div>-->
+            <!--<div><label for="size">工作区大小</label><input type="text" id="size" ng-model="options.size"/></div>-->
+            <!--<div><label for="r">读写器覆盖范围</label><input type="text" id="r" ng-model="options.r"/></div>-->
+            <!--<div><label for="iterations">最大代数</label><input type="text" id="iterations" ng-model="options.iterations"/></div>-->
+            <!--<div><label for="m">种群大小</label><input type="text" id="m" ng-model="options.m"/></div>-->
+            <!--<div><label for="pc">交叉概率</label><input type="text" id="pc" ng-model="options.pc"/></div>-->
+            <!--<div><label for="pm">突变概率</label><input type="text" id="pm" ng-model="options.pm"/></div>-->
+        </fieldset>
+        <button class="btn-primary" ng-click="simulate()">GO</button>
+    </div>
+
+    <div class="statistic animate-switch" ng-class="panels.result">
+      <div class="no-result" ng-show="!resultReturned">暂无数据</div>
+      <div id="result" ng-show="resultReturned">
+      </div>
+    </div>
 </div>

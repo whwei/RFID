@@ -83,8 +83,8 @@ a {
 
 /*nav area*/
 .nav-main {
-	width: 25%;
-	background-color: rgb(33, 36, 44);
+	width: 20%;
+	/*background-color: rgb(33, 36, 44);*/
 }
 
 .nav-main ul {
@@ -100,17 +100,13 @@ a {
 	border-radius: 0;
 	border: 0;
 	padding-left: 25px;
-	color: rgb(171, 184, 194);
+	color: rgba(33, 36, 44, 0.5);
 }
 
 .nav-main .list-group-item:hover {
-	background: rgb(22, 24, 28);
+	color: rgb(22, 24, 28);
 }
 
-.nav-main .list-title {
-	padding-left: 15px;
-	background: rgb(22, 24, 28);
-}
 
 .nav-main .current::after {
 	content: '';
@@ -130,8 +126,9 @@ a {
 
 /*main view*/
 .main-content {
-    overflow: auto;
-	width: 75%;
+    overflow-x: hidden;
+    overflow-y: auto;
+	width: 80%;
     padding: 0 20px;
     box-shadow: -6px 0 10px rgba(0,0,0,.4);
 }
@@ -184,6 +181,37 @@ a {
 	border-color: #adadad;
 }
 
+.panels > div {
+    display: none;
+}
+
+.panels .show {
+    display: block;
+}
+
+.panels fieldset {
+    border: 1px solid rgba(33, 74, 130, .3);
+}
+
+.panels fieldset > div {
+    margin: 10px 0;
+}
+.panels fieldset label {
+    display: inline-block;
+    width: 20%;
+}
+.panels fieldset input {
+    border: 0;
+    border-bottom: 1px solid rgba(33, 74, 130, .3);
+    padding: 5px;
+    margin-left: 20px;
+    font-size: 16px;
+    outline: none;
+}
+.panels .no-result {
+    padding: 50px 0;
+    text-align: center;
+}
 
 
 
