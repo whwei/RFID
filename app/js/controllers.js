@@ -42,7 +42,14 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                 scope.generations = e.data.value.records;
                 scope.resultReturned = true;
 
-                $('#result').highcharts({
+                var readers = e.data.value.readers.map(function (v, i) {
+                    return [+v.x, +v.y, $scope.options.r.value];
+                });
+                var tags = e.data.value.tags.map(function (v, i) {
+                    return [+v.x, +v.y, 1];
+                });
+                console.log(e.data.value);
+                $('#fitness').highcharts({
                     chart: {
                         zoomType: 'x'
                     },
@@ -89,7 +96,6 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                             threshold: null
                         }
                     },
-
                     series: [{
                         type: 'area',
                         name: 'Fitness',
@@ -99,7 +105,35 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     }]
                 });
 
-                $scope.switchTab('result');
+                $('#bubble-chart').highcharts({
+                    chart: {
+                        type: 'bubble',
+                        zoomType: 'xy',
+                        height: 600,
+                        width: 600
+                    },
+                    xAxis: {
+                        gridLineWidth: 1,
+                        min: 0,
+                        max: $scope.options.size.value
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: $scope.options.size.value
+                    },
+                    title: {
+                        text: 'Solution'
+                    },
+                    series: [{
+                        name: '读写器',
+                        data: readers
+                    },{
+                        name: '标签',
+                        data: tags
+                    }]
+
+                });
+
             });
         } else if (e.data.type === 'options') {
             $scope.$apply(function(scope) {
