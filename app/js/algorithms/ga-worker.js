@@ -29,7 +29,10 @@ var GA = function (op) {
     this.population = [];
     this.readers = []; // best solution
     this.tags = [];
-    this.records = [];
+    this.records = {
+        avg: [],
+        highest:[]
+    };
 
 };
 
@@ -87,7 +90,7 @@ GA.prototype = {
             name: 'iterations',
             desc: '最大代数',
             optional: true,
-            value: 200
+            value: 50
         },
         m: {
             name: 'm',
@@ -105,7 +108,7 @@ GA.prototype = {
             name: 'pm',
             desc: '突变概率',
             optional: true,
-            value: 0.0001
+            value: 0.05
         }
     },
     testCM: function () {
@@ -149,6 +152,11 @@ GA.prototype = {
             }
         }
 
+        // random position for readers(best solution)
+        for (i = 0; i < this.options.rn.value; i++) {
+            this.readers.push(new Reader(randomNumber(), randomNumber()));
+        }
+
         this.status.initialized = true;
 
         return this;
@@ -156,8 +164,12 @@ GA.prototype = {
     reset: function () {
         this.population = [];
         this.tags = [];
+        this.readers = [];
         this.elements = [];
-        this.records = [];
+        this.records = {
+            avg: [],
+            highest:[]
+        };
         this.status.iteration = 0;
         this.status.initialized = false;
     },
@@ -176,22 +188,27 @@ GA.prototype = {
             j,
             len = this.population.length,
             rd,
-            highestFitness = 0,
+            highestFitness = this.getStatistic(this.readers, this.tags).fitness || 0,
             self = this,
             sum = 0,
             ac = 0,
             accumulated = [],
             winners = [];
 
-        this.population.forEach(function (s) {
-            s.statistic = self.getStatistic(s, self.tags);
+
+        this.population.forEach(function (s, i) {
+            if (!s.statistic) {
+                s.statistic = self.getStatistic(s, self.tags);
+            }
 
             if (s.statistic.fitness > highestFitness) {
                 highestFitness = s.statistic.fitness;
-                self.readers = s;
+
+                self.readers = cloneReaders(s);
+                sum += s.statistic.fitness;
             }
-            sum += s.statistic.fitness;
         });
+
         for (i = 0; i < len; i++) {
             this.population[i].statistic = this.getStatistic(this.population[i], this.tags);
             ac += this.population[i].statistic.fitness / sum;
@@ -199,8 +216,12 @@ GA.prototype = {
         }
         
         accumulated.unshift(0);
+        
+        // add the best one from last generation
+        winners.push(cloneReaders(this.readers));
+
         // individual selection
-        for (j = 0; j < len; j++) {
+        for (j = 0; j < len - 1; j++) {
             rd = Math.random();
             for (i = accumulated.length - 1; i >= 1; i--) {
                 if (rd <= accumulated[i] && rd >= accumulated[i - 1]) {
@@ -209,7 +230,6 @@ GA.prototype = {
                 }
             }
         }
-        
         // cross operation
         var halfLen = len / 2;
         for (i = 0; i < halfLen; i++) {
@@ -221,9 +241,25 @@ GA.prototype = {
             mutation(winners[i], this.options.pm.value);
         }
 
+//console.log('then end pick', this.readers.statistic.fitness, highestFitness);
         this.population = winners;
 
-        this.records.push(sum / len);
+        // get the best one from the new generation
+        this.population.forEach(function (s, i) {
+            s.statistic = self.getStatistic(s, self.tags);
+
+            // TEMP
+            if (s.statistic.fitness > highestFitness) {
+                highestFitness = s.statistic.fitness;
+
+                self.readers = cloneReaders(s);
+            }
+        });
+
+//console.info('finally', this.readers.statistic.fitness);
+
+        this.records.avg.push(sum / len);
+        this.records.highest.push(highestFitness);
 
         return this;
     },
@@ -231,12 +267,15 @@ GA.prototype = {
     // received power of tag from reader
     getPower: function (reader, tag, it) {
         var d = 0;
-        if (it >= 0) {
+        if (it && it >= 0) {
             d = reader.distance[it];
         } else {
             d = distance(reader, tag);
         }
         return (this.options.lambda.value * this.options.lambda.value * this.options.G.value * this.options.EIRP.value) / Math.pow(4 * Math.PI * d, 2);
+    },
+    isInField: function (reader, tag, it) {
+        return reader.distance[it] <= this.options.r.value;
     },
     getStatistic: function (readers, tags) {
         var self = this,
@@ -253,10 +292,12 @@ GA.prototype = {
         // coverage
         var coverage = 0;
         tags.forEach(function (tag, it) {
-            readers.forEach(function (reader, ir) {
-                //coverage
-                coverage += reader.distance[it] <= self.options.r.value ? 1 : 0;
-            });
+            for(var p = 0; p < readers.length; p++) {
+                if (self.isInField(readers[p], null, it)) {
+                    coverage += 1;
+                    break;
+                }
+            }
         });
         results.push({
             object: 'coverage',
@@ -266,6 +307,7 @@ GA.prototype = {
 
         // interference
         var i = 0,
+            rt = 0,
             max = 0,
             temp = 0,
             interference = 0;
@@ -277,8 +319,8 @@ GA.prototype = {
                 max = max > temp ? max : temp;
                 i += temp;
             });
-            i = max / i;
-            interference += i;
+            rt = max / i;
+            interference += rt ? rt : 0;
         });
         results.push({
             object: 'interference',
@@ -288,32 +330,31 @@ GA.prototype = {
 
         // load balance
         var ni = 0,
-            balance = 0;
-        readers.forEach(function (reader, ir) {
+            balance = 1;
+        tags.forEach(function (tags, it) {
             ni = 0;
-            tags.forEach(function (tag, it) {
-                if (reader.distance[it] <= self.options.r.value) {
+            readers.forEach(function (reader, ir) {
+                if (self.isInField(reader, null, it)) {
                     ni++;
                 }
             });
-
-            balance += ni !== 0 ?
-                (ni / self.options.tn.value) * Math.log(ni / self.options.tn.value) / Math.log(self.options.rn.value)
-                :
-                0;
-
+            ni = ni === 0 ? 1 : ni;
+            balance = balance * (1 / ni);
         });
         results.push({
             object: 'loadBalance',
             weight: 0.333,
-            value: -1 * balance
+            value: balance
         });
 
 
         return {
-            readers: readers.slice(), // deep copy
             results: results,
             fitness: results.reduce(function(memo, v) {return memo + v.weight * v.value;}, 0)
+        };
+        return {
+            results: results,
+            fitness: Math.random()
         };
     }
 };
@@ -337,6 +378,38 @@ function extend(obj) {
     return obj;
 }
 
+function clone(myObj){
+    if(typeof(myObj) !== 'object' || myObj === null) {
+        return myObj;
+    }
+
+    var newObj = {};
+    for(var i in myObj){
+        newObj[i] = clone(myObj[i]);
+    }
+    return newObj;
+}
+
+function cloneArray(arr) {
+    var ret = [];
+    arr.forEach(function(v, i) {
+        if (typeof(v) === 'object') {
+            ret.push(clone(v));
+        } else {
+            ret.push(v);
+        }
+    });
+
+    return ret;
+}
+
+function cloneReaders (target) {
+    var ret = [];
+    ret = cloneArray(target);
+    ret.statistic = clone(target.statistic);
+    return ret;
+}
+
 function distance(p1, p2) {
     if (check(p1.x) && check(p1.y) && check(p2.x) && check(p2.y)) {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
@@ -357,13 +430,26 @@ function randomNumber(min, max) {
 function cross(g1, g2, pc) {
     var i,
         temp,
-        len = g1 && g1.length;
+        len = g1 && g1.length,
+        len2 = g2 && g2.length;
+
+    if (!len || !len2 || len !== len2) {
+        console.error('array length unmatch');
+        return;
+    }
 
     for (i = 0; i < len; i++) {
+        // cross x
         if (Math.random() <= pc) {
-            temp = g1[i];
-            g1[i] = g2[i];
-            g2[i] = temp;
+            temp = g1[i].x;
+            g1[i].x = g2[i].x;
+            g2[i].x = temp;
+        }
+        // cross y
+        if (Math.random() <= pc) {
+            temp = g1[i].y;
+            g1[i].y = g2[i].y;
+            g2[i].y = temp;
         }
     }
 }

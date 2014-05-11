@@ -151,6 +151,8 @@ ul li {
     padding: 0 20px 50px;
 }
 
+
+/*algorithm*/
 .content-nav {
 	text-align: center;
 	padding: 20px;
@@ -240,6 +242,9 @@ ul li {
     text-align: center;
 }
 
+.chart {
+    margin: 20px 0;
+}
 
 
 /* add algorithm */

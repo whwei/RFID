@@ -23,8 +23,10 @@
     </div>
 
     <div class="statistic animate-switch" ng-class="panels.result">
-      <div class="no-result" ng-show="!resultReturned">暂无数据</div>
-      <div id="fitness" ng-show="resultReturned">
-      </div>
+        <div class="no-result" ng-show="!resultReturned">暂无数据</div>
+        <!--avg fitness-->
+        <div id="fitness" class="chart" ng-show="resultReturned"></div>
+        <!--highest fitness-->
+        <div id="highest" chart="chart" ng-show="resultReturned"></div>
     </div>
 </div>
