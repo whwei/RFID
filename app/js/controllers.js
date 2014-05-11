@@ -166,17 +166,16 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     chart: {
                         type: 'bubble',
                         zoomType: 'xy',
-                        height: 600,
                         width: 600
                     },
                     xAxis: {
                         gridLineWidth: 1,
                         min: 0,
-                        max: $scope.options.size.value
+                        max: $scope.options.xsize.value
                     },
                     yAxis: {
                         min: 0,
-                        max: $scope.options.size.value
+                        max: $scope.options.ysize.value
                     },
                     title: {
                         text: '模拟结果'
@@ -204,6 +203,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         }
                     }
                 }
+
                 scope.options = opts;
             });
         }

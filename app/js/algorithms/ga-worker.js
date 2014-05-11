@@ -50,9 +50,15 @@ GA.prototype = {
             optional: true,
             value: 30
         },
-        size: {
-            name: 'size',
-            desc: '工作区大小',
+        xsize: {
+            name: 'xsize',
+            desc: '工作区宽度',
+            optional: true,
+            value: 30
+        },
+        ysize: {
+            name: 'ysize',
+            desc: '工作区高度',
             optional: true,
             value: 30
         },
@@ -109,6 +115,24 @@ GA.prototype = {
             desc: '突变概率',
             optional: true,
             value: 0.05
+        },
+        wc: {
+            name: 'wc',
+            desc: '覆盖率权重',
+            optional: true,
+            value: 0.7
+        },
+        wi: {
+            name: 'wi',
+            desc: '干扰率权重',
+            optional: true,
+            value: 0.1
+        },
+        wb: {
+            name: 'wb',
+            desc: '负载均衡权重',
+            optional: true,
+            value: 0.2
         }
     },
     testCM: function () {
@@ -139,8 +163,8 @@ GA.prototype = {
         // each tag has a random position
         for (i = 0; i < this.options.tn.value; i++) {
             this.tags.push({
-                x: randomNumber(),
-                y: randomNumber()
+                x: randomNumber(0, this.options.xsize.value),
+                y: randomNumber(0, this.options.ysize.value)
             });
         }
 
@@ -148,13 +172,13 @@ GA.prototype = {
         for (i = 0; i < this.options.m.value; i++) {
             this.population[i] = [];
             for (j = 0; j < this.options.rn.value; j++) {
-                this.population[i].push(new Reader(randomNumber(),randomNumber()));
+                this.population[i].push(new Reader(randomNumber(0, this.options.xsize.value),randomNumber(0, this.options.ysize.value)));
             }
         }
 
         // random position for readers(best solution)
         for (i = 0; i < this.options.rn.value; i++) {
-            this.readers.push(new Reader(randomNumber(), randomNumber()));
+            this.readers.push(new Reader(randomNumber(0, this.options.xsize.value), randomNumber(0, this.options.ysize.value)));
         }
 
         this.status.initialized = true;
@@ -205,8 +229,9 @@ GA.prototype = {
                 highestFitness = s.statistic.fitness;
 
                 self.readers = cloneReaders(s);
-                sum += s.statistic.fitness;
             }
+
+            sum += s.statistic.fitness;
         });
 
         for (i = 0; i < len; i++) {
@@ -241,7 +266,6 @@ GA.prototype = {
             mutation(winners[i], this.options.pm.value);
         }
 
-//console.log('then end pick', this.readers.statistic.fitness, highestFitness);
         this.population = winners;
 
         // get the best one from the new generation
@@ -255,8 +279,6 @@ GA.prototype = {
                 self.readers = cloneReaders(s);
             }
         });
-
-//console.info('finally', this.readers.statistic.fitness);
 
         this.records.avg.push(sum / len);
         this.records.highest.push(highestFitness);
@@ -301,7 +323,7 @@ GA.prototype = {
         });
         results.push({
             object: 'coverage',
-            weight: 0.333,
+            weight: self.options.wc.value,
             value: coverage / this.options.tn.value
         });
 
@@ -324,7 +346,7 @@ GA.prototype = {
         });
         results.push({
             object: 'interference',
-            weight: 0.333,
+            weight: self.options.wi.value,
             value: interference / this.options.tn.value
         });
 
@@ -343,7 +365,7 @@ GA.prototype = {
         });
         results.push({
             object: 'loadBalance',
-            weight: 0.333,
+            weight: self.options.wb.value,
             value: balance
         });
 
@@ -351,10 +373,6 @@ GA.prototype = {
         return {
             results: results,
             fitness: results.reduce(function(memo, v) {return memo + v.weight * v.value;}, 0)
-        };
-        return {
-            results: results,
-            fitness: Math.random()
         };
     }
 };
@@ -415,7 +433,7 @@ function distance(p1, p2) {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     }
     function check(n) {
-        return n >= 0 && n <= GA.prototype.options.size.value;
+        return n >= 0 && (n <= GA.prototype.options.xsize.value || n <= GA.prototype.options.ysize.value);
     }
 
     return null;
@@ -423,7 +441,7 @@ function distance(p1, p2) {
 
 function randomNumber(min, max) {
     min = min || 0;
-    max = max || GA.prototype.options.size.value;
+    max = max || 1;
     return (Math.random() * (max - min) + min).toFixed(3);
 }
 
@@ -461,7 +479,7 @@ function mutation(g, pm) {
 
     for (i = 0; i < len; i++) {
         if (Math.random() <= pm) {
-            g[i] = new Reader(randomNumber(), randomNumber());
+            g[i] = new Reader(randomNumber(0, GA.prototype.options.xsize.value), randomNumber(0, GA.prototype.options.ysize.value));
         }
     }
 }
