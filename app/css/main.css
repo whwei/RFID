@@ -12,7 +12,7 @@ body {
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.42857143;
-    color: #333;
+    color: #434343;
     background-color: #fff;
 }
 
@@ -20,18 +20,39 @@ a {
 	text-decoration: none;
     cursor: default;
 }
-.btn-primary {
-    padding: 5px 20px;
-    border-radius: 3px;
-    border: 1px solid rgb(46,75,114);
+
+button {
+    padding: 3px 6px;
+    border: 0;
     background-color: transparent;
-    font-size: 14px;
-    color: rgb(46,75,114);
+    color: rgb(78, 78, 78);
+}
+
+button:hover {
+    color: rgb(39, 39, 39);
+}
+
+ul li {
+    padding: 0;
+}
+
+.btn-primary {
+    padding: 5px 25px;
+    border-radius: 3px;
+    border: 1px solid rgb(60, 150, 225);
+    background-color: transparent;
+    font-size: 12px;
+    color: rgb(60, 150, 225);
     cursor: default;
     outline: none;
+    transition: all .218s ease;
 }
 .btn-primary:hover {
-    background-color: rgb(46,75,114);
+    background-color: rgb(60, 150, 225);
+    color: white;
+}
+.btn-primary:active {
+    background-color: rgb(10, 110, 200);
     color: white;
 }
 
@@ -39,41 +60,39 @@ a {
 .fa {
 	margin: 0 4px;
 }
-/*
+
 .toolbar {
     position: fixed;
     left: 0;top: 0;
     width: 100%;
-    height: 30px;
-    background-color: #111111;
+    height: 24px;
     z-index: 999;
 }
 .toolbar button {
     overflow: hidden;
     float: right;
     width: 40px;
-    height: 30px;
+    height: 24px;
     border: 0;
     outline: none;
-    color: white;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 13px;
     transition: all .218s ease;
-    text-shadow: rgba(0,0,0, .4) 0 0 5px;
+    color: #666;
     z-index: 1;
 }
 .toolbar button:hover {
-    text-shadow: rgba(0,0,0, .7) 0 0 10px;
     z-index: 10;
 }
-.toolbar .close {
-    background-color: #ff4136;
+.toolbar .close:hover {
+    background-color: red;
 }
-.toolbar .min {
-    background-color: #ff851b;
+.toolbar .min:hover {
+    background-color: rgb(80, 150, 225);
 }
-*/
+
 .layout {
+    margin: 24px 0 0 20px;
     height: 100%;
 	display: -webkit-flex;
 	-webkit-justify-content: space-between;
@@ -84,7 +103,6 @@ a {
 /*nav area*/
 .nav-main {
 	width: 20%;
-	/*background-color: rgb(33, 36, 44);*/
 }
 
 .nav-main ul {
@@ -95,29 +113,30 @@ a {
 
 .nav-main .list-group-item {
 	display: block;
-	padding: 10px;
 	position: relative;
+    padding: 6px 15px;
 	border-radius: 0;
 	border: 0;
-	padding-left: 25px;
-	color: rgba(33, 36, 44, 0.5);
+    font-size: 12px;
+	color: rgb(39, 39, 39);
+    transition: all 0.218s ease;
+}
+.nav-main .list-group-title {
+    margin: 15px 0 5px;
+    font-size: 14px;
+    color: #333;
 }
 
 .nav-main .list-group-item:hover {
-	color: rgb(22, 24, 28);
+    color: rgb(80, 150, 225);
 }
 
-
-.nav-main .current::after {
-	content: '';
-	position: absolute;
-	right: 0px; top: 50%;
-	display: block;
-	height: 14px;
-	width: 14px;
-    background-color: white;
-    -webkit-transform: translate(50%, -50%) rotate(45deg) ;
-    box-shadow: -8px 8px 8px rgba(0,0,0,.4);
+.nav-main .current {
+	background: rgb(80, 150, 225);
+    color: white;
+}
+.nav-main .current:hover {
+    color: white;
 }
 
 .nav-main .add-algo {
@@ -129,24 +148,17 @@ a {
     overflow-x: hidden;
     overflow-y: auto;
 	width: 80%;
-    padding: 0 20px;
-    box-shadow: -6px 0 10px rgba(0,0,0,.4);
+    padding: 0 20px 50px;
 }
 
-.nav-title {
+.content-nav {
 	text-align: center;
 	padding: 20px;
-	margin-bottom: 20px;
 }
 
-.nav-title .btn-group {
+.content-nav button {
 	display: inline-block;
-}
-
-.nav-title .btn-group .btn {
-	display: inline-block;
-	float: left;
-    padding: 6px 60px;
+    padding: 6px 20px;
     margin: 0;
     margin-left: -1px;
     font-size: 14px;
@@ -156,29 +168,16 @@ a {
     white-space: nowrap;
     vertical-align: middle;
     background-image: none;
-    border: 1px solid #ccc;
-    border-radius: 4px;
     background-color: white;
     outline: none;
 }
 
-.btn-group .btn:first-child {
-	margin: 0;
-	border-radius: 4px 0 0 4px;	
+.content-nav button:hover {
+	color: rgb(80, 150, 225);
 }
 
-.btn-group .btn:last-child {
-	border-radius: 0 4px 4px 0;	
-}
-
-.btn-group .btn:hover {
-	background-color: #ebebeb;
-	border-color: #adadad;
-}
-
-.btn-group .btn.current {
-	background-color: #ebebeb;
-	border-color: #adadad;
+.content-nav .current {
+    color: rgb(80, 150, 225);
 }
 
 .panels > div {
@@ -189,25 +188,53 @@ a {
     display: block;
 }
 
-.panels fieldset {
-    border: 1px solid rgba(33, 74, 130, .3);
+.simulate {
+    position: relative;
 }
-
-.panels fieldset > div {
-    margin: 10px 0;
+.options {
+    margin: 5px 0;
+    padding-left: 20px;
 }
-.panels fieldset label {
+.options label {
     display: inline-block;
+    margin-right: 10px;
     width: 20%;
+    text-align: right;
 }
-.panels fieldset input {
-    border: 0;
-    border-bottom: 1px solid rgba(33, 74, 130, .3);
-    padding: 5px;
+.options input {
     margin-left: 20px;
-    font-size: 16px;
+    padding: 5px;
+    border: 1px solid rgba(60, 150, 225, .3);
+    min-width: 200px;
+    font-size: 12px;
+    color: #666;
     outline: none;
 }
+.operations {
+    overflow: hidden;
+    margin: 20px;
+}
+.operations button {
+    float: right;
+}
+.calculating-mask {
+    display: -webkit-flex;
+    -webkit-justify-content: center;
+    -webkit-align-items: center;
+    position: absolute;
+    left: 0; top: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, .75);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 1.09s ease;
+}
+.calculating-show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
 .panels .no-result {
     padding: 50px 0;
     text-align: center;
@@ -222,8 +249,8 @@ a {
 .info input {
     width: 30%;
     padding: 8px;
-    border-radius: 3px;
-    border: 1px solid rgba(33, 74, 130, .3);
+    border: 1px solid rgba(60, 150, 225, .3);
+    color: #666;
     outline: none;
 }
 
@@ -231,10 +258,9 @@ a {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin: 30px 0;
+    margin: 30px 20px 30px 0;
     padding: 100px 80px;
-    border-radius: 10px;
-    border: 5px dashed rgba(33, 74, 130, .3);
+    border: 3px dashed rgba(60, 150, 225, .3);
 }
 
 #holder .tip {

@@ -1,20 +1,25 @@
 
-<div class="row nav-title">
-  <div class="btn-group">
-    <button class="btn" ng-class="tabs.simulate" ng-click="switchTab('simulate')">算法模拟</button>
-    <button class="btn" ng-class="tabs.result" ng-click="switchTab('result')">统计结果</button>
+<div class="row content-nav">
+  <div>
+    <button ng-class="tabs.simulate" ng-click="switchTab('simulate')">算法模拟</button>
+    <button ng-class="tabs.result" ng-click="switchTab('result')">统计结果</button>
   </div>
 </div>
 <div class="animate-switch-container panels">
     <div class="simulate animate-switch" ng-class="panels.simulate">
         <div id="bubble-chart" ng-show="resultReturned"></div>
-        <fieldset>
-            <legend>模拟参数</legend>
-            <div ng-repeat="option in options">
+        <div class="param-setting">
+            <h3>模拟参数</h3>
+            <div class="options" ng-repeat="option in options">
                 <label for="{{option.name}}">{{option.desc}}</label><input type="text" id="{{option.name}}" ng-model="option.value" />
             </div>
-        </fieldset>
-        <button class="btn-primary" ng-click="simulate()">GO</button>
+            <div class="operations">
+                <button class="btn-primary" ng-click="simulate()">模拟</button>
+            </div>
+        </div>
+        <div class="calculating-mask" ng-class="calculating">
+            <p>计算中...</p>
+        </div>
     </div>
 
     <div class="statistic animate-switch" ng-class="panels.result">

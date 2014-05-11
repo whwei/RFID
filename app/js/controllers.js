@@ -23,6 +23,7 @@ appControllers.controller('indexController', function ($scope) {
 appControllers.controller('algorithmController', function ($scope, $routeParams, $location) {
 	$scope.algo = $routeParams.algo;
     $scope.resultReturned = false;
+    $scope.calculating = '';
 
     // tab setting
     $scope.tabs = {simulate: 'current', result: ''};
@@ -122,7 +123,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         max: $scope.options.size.value
                     },
                     title: {
-                        text: 'Solution'
+                        text: '模拟结果'
                     },
                     series: [{
                         name: '读写器',
@@ -151,6 +152,10 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
             });
         }
 
+        $scope.$apply(function(scope) {
+            scope.calculating = '';
+        });
+
     }, false);
 
     $scope.switchTab = function (n) {
@@ -167,6 +172,8 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
 
 
     $scope.simulate = function () {
+        $scope.calculating = 'calculating-show';
+
         // run worker
         wk.postMessage({
             command: 'run',
