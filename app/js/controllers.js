@@ -47,65 +47,19 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                 scope.resultReturned = true;
 
                 var readers = e.data.value.readers.map(function (v, i) {
-                    return [+v.x, +v.y, $scope.options.r.value];
+                    return {x: +v.x, y: +v.y, z: 2};
                 });
                 var tags = e.data.value.tags.map(function (v, i) {
-                    return [+v.x, +v.y, 1];
+                    return {x: +v.x, y: +v.y, z: 1};
                 });
                 console.log(e.data.value);
-                $('#fitness').highcharts({
-                    chart: {
-                        zoomType: 'x'
-                    },
-                    title: {
-                        text: 'Fitness of each generation'
-                    },
-                    xAxis: {
-                        type: 'linear',
-                        minRange: 1
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Fitness'
-                        },
-                        min: 0
-                    },
-                    legend: {
-                        enabled: false
-                    },
-                    plotOptions: {
-                        area: {
-                            fillColor: {
-                                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
-                                stops: [
-                                    [0, Highcharts.getOptions().colors[0]],
-                                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                                ]
-                            },
-                            marker: {
-                                radius: 2
-                            },
-                            lineWidth: 1,
-                            states: {
-                                hover: {
-                                    lineWidth: 1
-                                }
-                            },
-                            threshold: null
-                        }
-                    },
-                    series: [{
-                        type: 'area',
-                        name: 'Fitness',
-                        pointInterval: 1,
-                        pointStart: 1,
-                        data: e.data.value.records.avg
-                    }]
-                });
 
                 $('#highest').highcharts({
                     chart: {
                         zoomType: 'x'
+                    },
+                    credits: {
+                        enabled: false
                     },
                     title: {
                         text: 'Highest fitness'
@@ -118,7 +72,8 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         title: {
                             text: 'Fitness'
                         },
-                        min: 0
+                        min: 0,
+                        max: 1
                     },
                     legend: {
                         enabled: false
@@ -159,6 +114,9 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         width: 400,
                         height: 400
                     },
+                    credits: {
+                        enabled: false
+                    },
                     xAxis: {
                         gridLineWidth: 1,
                         min: 0,
@@ -174,14 +132,23 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     title: {
                         text: null
                     },
+                    plotOptions: {
+                        bubble: {
+                            //maxSize: (200 * $scope.options.r.value / $scope.options.xsize.value) + '%',
+                            maxSize: 5,
+                            minSize: 3
+                        }
+                    },
                     series: [{
                         name: '读写器',
-                        data: readers
+                        data: readers,
+                        sizeBy: 'width'
                     },{
                         name: '标签',
                         data: tags
                     }]
                 });
+
 
             });
         } else if (e.data.type === 'options') {
@@ -209,6 +176,9 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         width: 400,
                         height: 400
                     },
+                    credits: {
+                        enabled: false
+                    },
                     xAxis: {
                         gridLineWidth: 1,
                         min: 0,
@@ -224,9 +194,17 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     title: {
                         text: null
                     },
+                    plotOptions: {
+                        bubble: {
+                            //maxSize: (200 * $scope.options.r.value / $scope.options.xsize.value) + '%',
+                            maxSize: 5,
+                            minSize: 3
+                        }
+                    },
                     series: [{
                         name: '读写器',
-                        data: scope.cfgReaders.map(function(v, i) {return [+v.x, +v.y, $scope.options.r.value];})
+                        sizeBy: 'width',
+                        data: scope.cfgReaders.map(function(v, i) {return [+v.x, +v.y, 2];})
                     },{
                         name: '标签',
                         data: scope.result.tags.map(function(v, i) {return [+v.x, +v.y, 1];})

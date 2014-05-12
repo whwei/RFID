@@ -95,21 +95,27 @@ GA.prototype = {
         },
         Rq: {
             name: 'Rq',
-            desc: '',
-            optional: false,
+            desc: '门限值',
+            optional: true,
             value: 10
+        },
+        Ps: {
+            name: 'Ps',
+            desc: '读写器输出功率',
+            optional: true,
+            value: 33
         },
         iterations: {
             name: 'iterations',
             desc: '最大代数',
             optional: true,
-            value: 50
+            value: 100
         },
         m: {
             name: 'm',
             desc: '种群大小',
             optional: true,
-            value: 20
+            value: 30
         },
         pc: {
             name: 'pc',
@@ -127,19 +133,19 @@ GA.prototype = {
             name: 'wc',
             desc: '覆盖率权重',
             optional: true,
-            value: 0.7
+            value: 0.9
         },
         wi: {
             name: 'wi',
             desc: '干扰率权重',
             optional: true,
-            value: 0.1
+            value: 0.05
         },
         wb: {
             name: 'wb',
             desc: '负载均衡权重',
             optional: true,
-            value: 0.2
+            value: 0.05
         }
     },
     testCM: function () {
@@ -207,11 +213,18 @@ GA.prototype = {
     run: function(it) {
         var i,
             len = it || this.options.iterations.value;
+
+        var st = +new Date();
         for (i = 0; i < len; i++) {
             this.iterator();
             this.status.iteration = i;
         }
-
+        var et = +new Date();
+        var duration = et - st;
+        this.records.run = {
+            total: duration,
+            iterations: len
+        };
         return this;
     },
     iterator: function () {
@@ -302,7 +315,7 @@ GA.prototype = {
     // received power of tag from reader
     getPower: function (reader, tag, it) {
         var d = 0;
-        if (it && it >= 0) {
+        if (it >= 0) {
             d = reader.distance[it];
         } else {
             d = distance(reader, tag);
@@ -310,7 +323,10 @@ GA.prototype = {
         return (this.options.lambda.value * this.options.lambda.value * this.options.G.value * this.options.EIRP.value) / Math.pow(4 * Math.PI * d, 2);
     },
     isInField: function (reader, tag, it) {
-        return reader.distance[it] <= this.options.r.value;
+//        var L =
+//        return this.options.Ps.value - L >= this.options.Rq.value;
+        //return reader.distance[it] <= this.options.r.value;
+        return this.getPower(reader, tag, it) >= this.options.Rq.value;
     },
     getStatistic: function (readers, tags) {
         var self = this,
@@ -319,7 +335,6 @@ GA.prototype = {
         // calculate the distance between each reader and each tag
         readers.forEach(function (reader, ir) {
             tags.forEach(function (tag, it) {
-                //coverage
                 reader.distance[it] = distance(reader, tag);
             });
         });
@@ -328,7 +343,7 @@ GA.prototype = {
         var coverage = 0;
         tags.forEach(function (tag, it) {
             for(var p = 0; p < readers.length; p++) {
-                if (self.isInField(readers[p], null, it)) {
+                if (self.isInField(readers[p], tag, it)) {
                     coverage += 1;
                     break;
                 }
@@ -368,15 +383,17 @@ GA.prototype = {
         // load balance
         var ni = 0,
             balance = 1;
-        tags.forEach(function (tags, it) {
+        tags.forEach(function (tag, it) {
             ni = 0;
             readers.forEach(function (reader, ir) {
-                if (self.isInField(reader, null, it)) {
+                if (self.isInField(reader, tag, it)) {
                     ni++;
                 }
             });
-            ni = ni === 0 ? 1 : ni;
-            balance = balance * (1 / ni);
+            if (ni !== 0 && ni !== 1){
+                balance = balance * (1 / ni);
+            }
+
         });
         results.push({
             object: 'loadBalance',
@@ -384,7 +401,6 @@ GA.prototype = {
             weight: self.options.wb.value,
             value: balance
         });
-
 
         return {
             results: results,
@@ -445,13 +461,17 @@ function cloneReaders (target) {
 }
 
 function distance(p1, p2) {
+    try{
     if (check(p1.x) && check(p1.y) && check(p2.x) && check(p2.y)) {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+    }
+    } catch (e) {
+//        console.error(e);
+//        console.error(p1, p2);
     }
     function check(n) {
         return n >= 0 && (n <= GA.prototype.options.xsize.value || n <= GA.prototype.options.ysize.value);
     }
-
     return null;
 }
 
