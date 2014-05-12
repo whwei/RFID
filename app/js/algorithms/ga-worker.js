@@ -1,6 +1,7 @@
 "use strict";
 
 self.addEventListener('message', function (e) {
+
     switch (e.data.command) {
         case 'run':
             var ga = new GA(e.data.options);
@@ -14,6 +15,12 @@ self.addEventListener('message', function (e) {
             self.postMessage({
                 type: 'options',
                 value: JSON.stringify(GA.prototype.options)
+            });
+            break;
+        case 'getStatistic':
+            self.postMessage({
+                type: 'statistic',
+                value: JSON.stringify(GA.prototype.getStatistic(e.data.cfgReaders, e.data.tags))
             });
             break;
     }
@@ -213,6 +220,8 @@ GA.prototype = {
             len = this.population.length,
             rd,
             highestFitness = this.getStatistic(this.readers, this.tags).fitness || 0,
+            worst = 1,
+            worstPos = 0,
             self = this,
             sum = 0,
             ac = 0,
@@ -235,22 +244,18 @@ GA.prototype = {
         });
 
         for (i = 0; i < len; i++) {
-            this.population[i].statistic = this.getStatistic(this.population[i], this.tags);
             ac += this.population[i].statistic.fitness / sum;
             accumulated[i] = ac;
         }
         
         accumulated.unshift(0);
-        
-        // add the best one from last generation
-        winners.push(cloneReaders(this.readers));
 
         // individual selection
-        for (j = 0; j < len - 1; j++) {
+        for (j = 0; j < len; j++) {
             rd = Math.random();
             for (i = accumulated.length - 1; i >= 1; i--) {
                 if (rd <= accumulated[i] && rd >= accumulated[i - 1]) {
-                    winners.push(this.population[i - 1]);
+                    winners.push(cloneReaders(this.population[i - 1]));
                     break;
                 }
             }
@@ -272,13 +277,21 @@ GA.prototype = {
         this.population.forEach(function (s, i) {
             s.statistic = self.getStatistic(s, self.tags);
 
-            // TEMP
+            // find best
             if (s.statistic.fitness > highestFitness) {
                 highestFitness = s.statistic.fitness;
 
                 self.readers = cloneReaders(s);
             }
+            // find wrost
+            if (s.statistic.fitness < worst) {
+                worst = s.statistic.fitness;
+
+                worstPos = i;
+            }
         });
+
+        this.population[worstPos] = cloneReaders(this.readers);
 
         this.records.avg.push(sum / len);
         this.records.highest.push(highestFitness);
@@ -323,6 +336,7 @@ GA.prototype = {
         });
         results.push({
             object: 'coverage',
+            desc: '覆盖率',
             weight: self.options.wc.value,
             value: coverage / this.options.tn.value
         });
@@ -346,6 +360,7 @@ GA.prototype = {
         });
         results.push({
             object: 'interference',
+            desc: '干扰率',
             weight: self.options.wi.value,
             value: interference / this.options.tn.value
         });
@@ -365,6 +380,7 @@ GA.prototype = {
         });
         results.push({
             object: 'loadBalance',
+            desc: '负载均衡',
             weight: self.options.wb.value,
             value: balance
         });

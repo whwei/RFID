@@ -38,9 +38,12 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
 
     // bind worker event
     wk.addEventListener('message', function (e) {
+
         if (e.data.type === 'result'){
             $scope.$apply(function(scope) {
+                scope.result = e.data.value;
                 scope.generations = e.data.value.records;
+                scope.cfgReaders = cloneReaders(e.data.value.readers);
                 scope.resultReturned = true;
 
                 var readers = e.data.value.readers.map(function (v, i) {
@@ -57,11 +60,6 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     title: {
                         text: 'Fitness of each generation'
                     },
-                    subtitle: {
-                        text: document.ontouchstart === undefined ?
-                            'Click and drag in the plot area to zoom in' :
-                            'Pinch the chart to zoom in'
-                    },
                     xAxis: {
                         type: 'linear',
                         minRange: 1
@@ -70,7 +68,6 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         title: {
                             text: 'Fitness'
                         },
-                        max: 1,
                         min: 0
                     },
                     legend: {
@@ -113,11 +110,6 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     title: {
                         text: 'Highest fitness'
                     },
-                    subtitle: {
-                        text: document.ontouchstart === undefined ?
-                            'Click and drag in the plot area to zoom in' :
-                            'Pinch the chart to zoom in'
-                    },
                     xAxis: {
                         type: 'linear',
                         minRange: 1
@@ -126,7 +118,6 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         title: {
                             text: 'Fitness'
                         },
-                        max: 1,
                         min: 0
                     },
                     legend: {
@@ -165,8 +156,8 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                 $('#bubble-chart').highcharts({
                     chart: {
                         type: 'bubble',
-                        zoomType: 'xy',
-                        width: 600
+                        width: 400,
+                        height: 400
                     },
                     xAxis: {
                         gridLineWidth: 1,
@@ -175,10 +166,13 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     },
                     yAxis: {
                         min: 0,
-                        max: $scope.options.ysize.value
+                        max: $scope.options.ysize.value,
+                        title: {
+                            text: null
+                        }
                     },
                     title: {
-                        text: '模拟结果'
+                        text: null
                     },
                     series: [{
                         name: '读写器',
@@ -187,7 +181,6 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         name: '标签',
                         data: tags
                     }]
-
                 });
 
             });
@@ -206,11 +199,79 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
 
                 scope.options = opts;
             });
+        } else if (e.data.type === 'statistic') {
+            $scope.$apply(function(scope) {
+                scope.cfgReaders.statistic = JSON.parse(e.data.value);
+
+                $('#bubble-chart').highcharts({
+                    chart: {
+                        type: 'bubble',
+                        width: 400,
+                        height: 400
+                    },
+                    xAxis: {
+                        gridLineWidth: 1,
+                        min: 0,
+                        max: $scope.options.xsize.value
+                    },
+                    yAxis: {
+                        min: 0,
+                        max: $scope.options.ysize.value,
+                        title: {
+                            text: null
+                        }
+                    },
+                    title: {
+                        text: null
+                    },
+                    series: [{
+                        name: '读写器',
+                        data: scope.cfgReaders.map(function(v, i) {return [+v.x, +v.y, $scope.options.r.value];})
+                    },{
+                        name: '标签',
+                        data: scope.result.tags.map(function(v, i) {return [+v.x, +v.y, 1];})
+                    }]
+                });
+            });
+
         }
 
         $scope.$apply(function(scope) {
             scope.calculating = '';
         });
+
+        // helper function
+        function clone(myObj){
+            if(typeof(myObj) !== 'object' || myObj === null) {
+                return myObj;
+            }
+
+            var newObj = {};
+            for(var i in myObj){
+                newObj[i] = clone(myObj[i]);
+            }
+            return newObj;
+        }
+
+        function cloneArray(arr) {
+            var ret = [];
+            arr.forEach(function(v, i) {
+                if (typeof(v) === 'object') {
+                    ret.push(clone(v));
+                } else {
+                    ret.push(v);
+                }
+            });
+
+            return ret;
+        }
+
+        function cloneReaders (target) {
+            var ret = [];
+            ret = cloneArray(target);
+            ret.statistic = clone(target.statistic);
+            return ret;
+        }
 
     }, false);
 
@@ -234,6 +295,15 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
         wk.postMessage({
             command: 'run',
             options: $scope.options
+        });
+    };
+
+
+    $scope.updateStatistic = function () {
+        wk.postMessage({
+            command: 'getStatistic',
+            cfgReaders: $scope.cfgReaders,
+            tags: $scope.result.tags
         });
     };
 

@@ -7,7 +7,34 @@
 </div>
 <div class="animate-switch-container panels">
     <div class="simulate animate-switch" ng-class="panels.simulate">
-        <div id="bubble-chart" ng-show="resultReturned"></div>
+        <div class="best-solution"  ng-show="resultReturned">
+            <div id="bubble-chart" class="chart"></div>
+            <div class="result-list">
+                <div class="statistic">
+                    <h4>目标函数</h4>
+                    <div class="table-container">
+                        <table>
+                            <tr><th>目标</th><th>数值</th></tr>
+                            <tr ng-repeat="r in cfgReaders.statistic.results"><td>{{ r.desc }}</td><td>{{ r.value | number }}</td></tr>
+                            <tr><td>适应度</td><td>{{ cfgReaders.statistic.fitness | number }}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="readers">
+                    <h4>读写器坐标</h4>
+                    <div class="table-container">
+                        <table>
+                            <tr><th>x</th><th>y</th></tr>
+                            <tr ng-repeat="r in cfgReaders">
+                                <td><input type="text" value="{{ r.x | number }}" ng-model="r.x" /></td>
+                                <td><input type="text" value="{{ r.y | number }}" ng-model="r.y" /></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <button class="btn-primary update-statistic" ng-click="updateStatistic()">更新</button>
+            </div>
+        </div>
         <div class="param-setting">
             <h3>模拟参数</h3>
             <div class="options" ng-repeat="option in options">

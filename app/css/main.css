@@ -16,6 +16,12 @@ body {
     background-color: #fff;
 }
 
+ul {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+}
+
 a {
 	text-decoration: none;
     cursor: default;
@@ -105,12 +111,6 @@ ul li {
 	width: 20%;
 }
 
-.nav-main ul {
-	padding: 0;
-	margin: 0;
-    list-style-type: none;
-}
-
 .nav-main .list-group-item {
 	display: block;
 	position: relative;
@@ -157,7 +157,7 @@ ul li {
 /*algorithm*/
 .content-nav {
 	text-align: center;
-	padding: 20px;
+	padding: 0 20px 20px;
 }
 
 .content-nav button {
@@ -182,6 +182,10 @@ ul li {
 
 .content-nav .current {
     color: rgb(80, 150, 225);
+}
+
+.chart {
+    margin-bottom: 40px;
 }
 
 .panels {
@@ -245,14 +249,55 @@ ul li {
     opacity: 1;
     pointer-events: auto;
 }
-
 .panels .no-result {
     padding: 50px 0;
     text-align: center;
 }
-
-.chart {
-    margin-bottom: 50px;
+.best-solution {
+    display: -webkit-flex;
+    -webkit-justify-content: space-between;
+}
+.result-list {
+    display: -webkit-flex;
+    -webkit-flex-direction: column;
+    width: 310px;
+    margin-left: 20px;
+}
+.result-list h4 {
+    margin: 0 0 5px;
+}
+.result-list table {
+    width: 90%;
+    text-align: center;
+    border-collapse: collapse;
+    border: 1px solid rgba(200, 200, 200, .5);
+}
+.result-list table th,
+.result-list table td {
+    padding: 0 10px;
+    width: 50%;
+    border: 1px solid rgba(200, 200, 200, .5);
+}
+.result-list input {
+    width: 80%;
+    border: 0;
+    text-align: center;
+    outline: none;
+}
+.result-list .table-container {
+    height: calc(100% - 25px);
+    overflow-y: auto;
+}
+.statistic {
+    margin-bottom: 20px;
+}
+.readers {
+    height: 240px;
+    margin-bottom: 20px;
+}
+.update-statistic {
+    width: 200px;
+    margin: 0 auto;
 }
 
 
