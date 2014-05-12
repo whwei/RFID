@@ -7,14 +7,37 @@
 </div>
 <div class="animate-switch-container panels">
     <div class="simulate animate-switch" ng-class="panels.simulate">
+        <div class="param-setting">
+            <h3>模拟参数</h3>
+            <div class="col-container">
+                <div class="options" ng-repeat="option in options">
+                    <label for="{{option.name}}">{{option.desc}}</label><input type="text" id="{{option.name}}" ng-model="option.value" />
+                </div>
+            </div>
+            <div class="operations">
+                <button class="btn-primary" ng-click="simulate()">模拟</button>
+            </div>
+        </div>
+        <div class="calculating-mask" ng-class="calculating">
+            <p>计算中...</p>
+        </div>
+    </div>
+
+    <div class="statistic animate-switch" ng-class="panels.result">
+        <div class="no-result" ng-show="!resultReturned">暂无数据</div>
+        <!--best fitness-->
         <div class="best-solution"  ng-show="resultReturned">
-            <div id="bubble-chart" class="chart"></div>
+            <div class="bubble-charts">
+                <div id="bubble-chart-origin" class="chart"></div>
+                <div id="bubble-chart-result" class="chart"></div>
+            </div>
+
             <div class="result-list">
                 <div class="statistic">
                     <h4>目标函数</h4>
                     <div class="table-container">
                         <table>
-                            <tr><th>目标</th><th>数值</th><th>权重</th></tr>
+                            <tr><th>指标</th><th>数值</th><th>权重</th></tr>
                             <tr ng-repeat="r in cfgReaders.statistic.results">
                                 <td>{{ r.desc }}</td>
                                 <td>{{ r.value | number }}</td>
@@ -40,24 +63,6 @@
                 <button class="btn-primary update-statistic" ng-click="updateStatistic()">更新</button>
             </div>
         </div>
-        <div class="param-setting">
-            <h3>模拟参数</h3>
-            <div class="options" ng-repeat="option in options">
-                <label for="{{option.name}}">{{option.desc}}</label><input type="text" id="{{option.name}}" ng-model="option.value" />
-            </div>
-            <div class="operations">
-                <button class="btn-primary" ng-click="simulate()">模拟</button>
-            </div>
-        </div>
-        <div class="calculating-mask" ng-class="calculating">
-            <p>计算中...</p>
-        </div>
-    </div>
-
-    <div class="statistic animate-switch" ng-class="panels.result">
-        <div class="no-result" ng-show="!resultReturned">暂无数据</div>
-        <!--avg fitness-->
-        <div id="fitness" class="chart" ng-show="resultReturned"></div>
         <!--highest fitness-->
         <div id="highest" chart="chart" ng-show="resultReturned"></div>
     </div>

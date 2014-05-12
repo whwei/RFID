@@ -108,7 +108,50 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     }]
                 });
 
-                $('#bubble-chart').highcharts({
+                $('#bubble-chart-origin').highcharts({
+                    chart: {
+                        type: 'bubble',
+                        width: 400,
+                        height: 400
+                    },
+                    credits: {
+                        enabled: false
+                    },
+                    xAxis: {
+                        tickInterval: 5,
+                        gridLineWidth: 1,
+                        min: 0,
+                        max: $scope.options.xsize.value
+                    },
+                    yAxis: {
+                        tickInterval: 5,
+                        min: 0,
+                        max: $scope.options.ysize.value,
+                        title: {
+                            text: null
+                        }
+                    },
+                    title: {
+                        text: '原始读写器分布'
+                    },
+                    plotOptions: {
+                        bubble: {
+                            //maxSize: (200 * $scope.options.r.value / $scope.options.xsize.value) + '%',
+                            maxSize: 5,
+                            minSize: 3
+                        }
+                    },
+                    series: [{
+                        name: '读写器',
+                        data: $scope.result.initialReaders.map(function(v, i) {return [+v.x, +v.y, 2];}),
+                        sizeBy: 'width'
+                    },{
+                        name: '标签',
+                        data: $scope.result.tags.map(function(v, i) {return [+v.x, +v.y, 1];})
+                    }]
+                });
+
+                $('#bubble-chart-result').highcharts({
                     chart: {
                         type: 'bubble',
                         width: 400,
@@ -119,10 +162,12 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     },
                     xAxis: {
                         gridLineWidth: 1,
+                        tickInterval: 5,
                         min: 0,
                         max: $scope.options.xsize.value
                     },
                     yAxis: {
+                        tickInterval: 5,
                         min: 0,
                         max: $scope.options.ysize.value,
                         title: {
@@ -130,7 +175,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         }
                     },
                     title: {
-                        text: null
+                        text: '优化后读写器分布'
                     },
                     plotOptions: {
                         bubble: {
@@ -149,7 +194,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     }]
                 });
 
-
+                $scope.switchTab('result');
             });
         } else if (e.data.type === 'options') {
             $scope.$apply(function(scope) {
@@ -170,7 +215,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
             $scope.$apply(function(scope) {
                 scope.cfgReaders.statistic = JSON.parse(e.data.value);
 
-                $('#bubble-chart').highcharts({
+                $('#bubble-chart-result').highcharts({
                     chart: {
                         type: 'bubble',
                         width: 400,
@@ -180,12 +225,13 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         enabled: false
                     },
                     xAxis: {
+                        tickInterval: 5,
                         gridLineWidth: 1,
                         min: 0,
                         max: $scope.options.xsize.value
                     },
                     yAxis: {
-                        min: 0,
+                        tickInterval: 5,
                         max: $scope.options.ysize.value,
                         title: {
                             text: null

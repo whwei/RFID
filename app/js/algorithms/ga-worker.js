@@ -75,41 +75,35 @@ GA.prototype = {
             optional: true,
             value: 5
         },
-        EIRP: {
-            name: 'EIRP',
-            desc: '',
-            optional: false,
-            value: 15
+        Gtx: {
+            name: 'Gtx',
+            desc: '天线增益',
+            optional: true,
+            value: 1.5
         },
-        G: {
-            name: 'G',
-            desc: '',
-            optional: false,
-            value: 3
-        },
-        lambda: {
-            name: 'lambda',
-            desc: '',
-            optional: false,
-            value: 13.56
+        Gtag: {
+            name: 'Gtag',
+            desc: '标签增益',
+            optional: true,
+            value: 1.5
         },
         Rq: {
             name: 'Rq',
             desc: '门限值',
             optional: true,
-            value: 10
+            value: -10
         },
         Ps: {
             name: 'Ps',
             desc: '读写器输出功率',
             optional: true,
-            value: 33
+            value: 30
         },
         iterations: {
             name: 'iterations',
             desc: '最大代数',
             optional: true,
-            value: 100
+            value: 50
         },
         m: {
             name: 'm',
@@ -148,25 +142,6 @@ GA.prototype = {
             value: 0.05
         }
     },
-    testCM: function () {
-        var g1 = [
-                {x:11,y:12},
-                {x:13,y:14},
-                {x:15,y:16},
-                {x:17,y:18},
-                {x:19,y:10}
-            ],
-            g2 = [
-                {x:21,y:22},
-                {x:23,y:24},
-                {x:25,y:26},
-                {x:27,y:28},
-                {x:29,y:20}
-            ];
-
-        mutation(g1, g2);
-
-    },
     init: function () {
         this.reset();
 
@@ -191,8 +166,12 @@ GA.prototype = {
 
         // random position for readers(best solution)
         for (i = 0; i < this.options.rn.value; i++) {
-            this.readers.push(new Reader(randomNumber(0, this.options.xsize.value), randomNumber(0, this.options.ysize.value)));
+            var nrd = new Reader(randomNumber(0, this.options.xsize.value), randomNumber(0, this.options.ysize.value));
+            this.readers.push(nrd);
+            this.initialReaders.push(clone(nrd));
         }
+
+        this.initialReaders.statistic = this.getStatistic(this.initialReaders, this.tags);
 
         this.status.initialized = true;
 
@@ -202,10 +181,12 @@ GA.prototype = {
         this.population = [];
         this.tags = [];
         this.readers = [];
+        this.initialReaders = [];
         this.elements = [];
         this.records = {
             avg: [],
-            highest:[]
+            highest:[],
+            run: {}
         };
         this.status.iteration = 0;
         this.status.initialized = false;
@@ -221,10 +202,9 @@ GA.prototype = {
         }
         var et = +new Date();
         var duration = et - st;
-        this.records.run = {
-            total: duration,
-            iterations: len
-        };
+        this.records.run.total = duration;
+        this.records.run.iterations = len;
+
         return this;
     },
     iterator: function () {
@@ -306,12 +286,17 @@ GA.prototype = {
 
         this.population[worstPos] = cloneReaders(this.readers);
 
+        this.check();
+
         this.records.avg.push(sum / len);
         this.records.highest.push(highestFitness);
 
         return this;
     },
+    // check if the current solution meet the requirement
+    check: function () {
 
+    },
     // received power of tag from reader
     getPower: function (reader, tag, it) {
         var d = 0;
@@ -320,12 +305,10 @@ GA.prototype = {
         } else {
             d = distance(reader, tag);
         }
-        return (this.options.lambda.value * this.options.lambda.value * this.options.G.value * this.options.EIRP.value) / Math.pow(4 * Math.PI * d, 2);
+        var L = 10 * Math.log(  Math.pow( 4 * Math.PI * d / 0.33 , 2) / (this.options.Gtx.value * this.options.Gtag.value) ) / Math.log(10) + rnd(0, 5);
+        return this.options.Ps.value - L;
     },
     isInField: function (reader, tag, it) {
-//        var L =
-//        return this.options.Ps.value - L >= this.options.Rq.value;
-        //return reader.distance[it] <= this.options.r.value;
         return this.getPower(reader, tag, it) >= this.options.Rq.value;
     },
     getStatistic: function (readers, tags) {
@@ -364,13 +347,16 @@ GA.prototype = {
             interference = 0;
         tags.forEach(function (tag, it) {
             i = 0;
-            max = 0;
+            max = -1000;
+            rt = 0;
             readers.forEach(function (reader, ir) {
                 temp = self.getPower(reader, tag, it);
                 max = max > temp ? max : temp;
                 i += temp;
             });
-            rt = max / i;
+            if (i !== 1) {
+                rt = max / i;
+            }
             interference += rt ? rt : 0;
         });
         results.push({
@@ -508,7 +494,6 @@ function cross(g1, g2, pc) {
     }
 }
 
-
 function mutation(g, pm) {
     var i,
         len = g && g.length;
@@ -518,4 +503,14 @@ function mutation(g, pm) {
             g[i] = new Reader(randomNumber(0, GA.prototype.options.xsize.value), randomNumber(0, GA.prototype.options.ysize.value));
         }
     }
+}
+
+// standard normal distribution
+function rnd_snd() {
+    return (Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1);
+}
+
+// get normal distribution number with given 'mean' and 'stdev'. http://www.protonfish.com/random.shtml
+function rnd(mean, stdev) {
+    return rnd_snd()*stdev+mean;
 }
