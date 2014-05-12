@@ -20,7 +20,7 @@ self.addEventListener('message', function (e) {
         case 'getStatistic':
             self.postMessage({
                 type: 'statistic',
-                value: JSON.stringify(GA.prototype.getStatistic(e.data.cfgReaders, e.data.tags))
+                value: JSON.stringify((new GA(e.data.options)).getStatistic(e.data.cfgReaders, e.data.tags))
             });
             break;
     }

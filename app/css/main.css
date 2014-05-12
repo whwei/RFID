@@ -275,8 +275,11 @@ ul li {
 .result-list table th,
 .result-list table td {
     padding: 0 10px;
-    width: 50%;
+    width: 33%;
     border: 1px solid rgba(200, 200, 200, .5);
+    overflow: hidden;
+    word-break: break-all;
+    text-overflow: ellipsis;
 }
 .result-list input {
     width: 80%;

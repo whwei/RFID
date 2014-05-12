@@ -302,6 +302,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
     $scope.updateStatistic = function () {
         wk.postMessage({
             command: 'getStatistic',
+            options: $scope.options,
             cfgReaders: $scope.cfgReaders,
             tags: $scope.result.tags
         });

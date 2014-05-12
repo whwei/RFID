@@ -14,9 +14,13 @@
                     <h4>目标函数</h4>
                     <div class="table-container">
                         <table>
-                            <tr><th>目标</th><th>数值</th></tr>
-                            <tr ng-repeat="r in cfgReaders.statistic.results"><td>{{ r.desc }}</td><td>{{ r.value | number }}</td></tr>
-                            <tr><td>适应度</td><td>{{ cfgReaders.statistic.fitness | number }}</td></tr>
+                            <tr><th>目标</th><th>数值</th><th>权重</th></tr>
+                            <tr ng-repeat="r in cfgReaders.statistic.results">
+                                <td>{{ r.desc }}</td>
+                                <td>{{ r.value | number }}</td>
+                                <td>{{ r.weight }}</td>
+                            </tr>
+                            <tr><td>适应度</td><td>{{ cfgReaders.statistic.fitness | number }}</td><td></td></tr>
                         </table>
                     </div>
                 </div>
@@ -24,8 +28,9 @@
                     <h4>读写器坐标</h4>
                     <div class="table-container">
                         <table>
-                            <tr><th>x</th><th>y</th></tr>
+                            <tr><th>序号</th><th>x</th><th>y</th></tr>
                             <tr ng-repeat="r in cfgReaders">
+                                <td>{{ $index+1 }}</td>
                                 <td><input type="text" value="{{ r.x | number }}" ng-model="r.x" /></td>
                                 <td><input type="text" value="{{ r.y | number }}" ng-model="r.y" /></td>
                             </tr>
