@@ -62,7 +62,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         enabled: false
                     },
                     title: {
-                        text: 'Highest fitness'
+                        text: 'Fitness 收敛图' + (e.data.value.records.bestPos !== 0 ? '（第' + (e.data.value.records.bestPos + 1) + '次模拟）' : '')
                     },
                     xAxis: {
                         type: 'linear',
@@ -104,9 +104,10 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         name: 'Fitness',
                         pointInterval: 1,
                         pointStart: 1,
-                        data: e.data.value.records.highest
+                        data: e.data.value.records[e.data.value.records.bestPos].highest
                     }]
                 });
+
 
                 $('#bubble-chart-origin').highcharts({
                     chart: {

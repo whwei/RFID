@@ -240,7 +240,7 @@ PSO.prototype = {
             ac += this.population[i].statistic.fitness / sum;
             accumulated[i] = ac;
         }
-        
+
         accumulated.unshift(0);
 
         // individual selection

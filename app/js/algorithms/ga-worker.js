@@ -36,10 +36,9 @@ var GA = function (op) {
     this.population = [];
     this.readers = []; // best solution
     this.tags = [];
-    this.records = {
-        avg: [],
-        highest:[]
-    };
+    this.records = [];
+    this.records.bestPos = 0;
+    this.status.repetition = 0;
 
 };
 
@@ -140,6 +139,12 @@ GA.prototype = {
             desc: '负载均衡权重',
             optional: true,
             value: 0.05
+        },
+        rpt: {
+            name: 'rpt',
+            desc: '运行次数',
+            optional: true,
+            value: 1
         }
     },
     init: function () {
@@ -171,6 +176,13 @@ GA.prototype = {
             this.initialReaders.push(clone(nrd));
         }
 
+        // initialize each run
+        for (i = 0; i < this.options.rpt.value; i++) {
+            this.records[i] = new Record();
+            this.records[i].readers = cloneReaders(this.readers);
+            this.records[i].population = cloneReaderArray(this.population);
+        }
+
         this.initialReaders.statistic = this.getStatistic(this.initialReaders, this.tags);
 
         this.status.initialized = true;
@@ -183,36 +195,80 @@ GA.prototype = {
         this.readers = [];
         this.initialReaders = [];
         this.elements = [];
-        this.records = {
-            avg: [],
-            highest:[],
-            run: {}
-        };
+        this.records = [];
+        this.records.bestPos = 0;
         this.status.iteration = 0;
         this.status.initialized = false;
+        this.status.repetition = 0;
     },
-    run: function(it) {
+    run: function() {
+        var i;
+
+        for(i = 0; i < this.options.rpt.value; i++) {
+            this.runOnce(this.records[i]);
+        }
+
+        this.simulationStatistic();
+
+        return this;
+    },
+    runOnce: function(record, it) {
         var i,
             len = it || this.options.iterations.value;
 
         var st = +new Date();
         for (i = 0; i < len; i++) {
-            this.iterator();
+            this.iterator(record);
             this.status.iteration = i;
         }
         var et = +new Date();
         var duration = et - st;
-        this.records.run.total = duration;
-        this.records.run.iterations = len;
+
+        record.run.total = duration;
+        record.run.iterations = len;
 
         return this;
     },
-    iterator: function () {
+    simulationStatistic: function() {
+        var j,
+            r,
+            best = 0,
+            sumFitness = 0,
+            sumTime = 0,
+            mse = 0,
+            rpt = this.options.rpt.value;
+
+        // find the best one
+        for(j = 0; j < rpt; j++) {
+            r = this.records[j];
+            if (r.readers.statistic.fitness > best) {
+                best = r.readers.statistic.fitness;
+                this.readers = cloneReaders(r.readers);
+                this.records.bestPos = j;
+            }
+
+            // avg fitness
+            sumFitness += r.readers.statistic.fitness;
+
+            // avg time
+            sumTime += r.run.total;
+        }
+
+        this.records.avgFitness = sumFitness / rpt;
+        this.records.avgTime = sumTime / rpt;
+
+        for(j = 0; j < rpt; j++) {
+            mse += Math.pow(this.records[j].readers.statistic.fitness - this.records.avgFitness, 2);
+        }
+        this.records.mse = mse / rpt;
+    },
+    iterator: function (record) {
         var i,
             j,
-            len = this.population.length,
+            population = record.population,
+            len = population.length,
             rd,
-            highestFitness = this.getStatistic(this.readers, this.tags).fitness || 0,
+            highestFitness = (record.readers.statistic ? record.readers.statistic.fitness : this.getStatistic(record.readers, this.tags).fitness) || 0,
             worst = 1,
             worstPos = 0,
             self = this,
@@ -222,7 +278,7 @@ GA.prototype = {
             winners = [];
 
 
-        this.population.forEach(function (s, i) {
+        population.forEach(function (s, i) {
             if (!s.statistic) {
                 s.statistic = self.getStatistic(s, self.tags);
             }
@@ -230,14 +286,14 @@ GA.prototype = {
             if (s.statistic.fitness > highestFitness) {
                 highestFitness = s.statistic.fitness;
 
-                self.readers = cloneReaders(s);
+                record.readers = cloneReaders(s);
             }
 
             sum += s.statistic.fitness;
         });
 
         for (i = 0; i < len; i++) {
-            ac += this.population[i].statistic.fitness / sum;
+            ac += population[i].statistic.fitness / sum;
             accumulated[i] = ac;
         }
         
@@ -248,7 +304,7 @@ GA.prototype = {
             rd = Math.random();
             for (i = accumulated.length - 1; i >= 1; i--) {
                 if (rd <= accumulated[i] && rd >= accumulated[i - 1]) {
-                    winners.push(cloneReaders(this.population[i - 1]));
+                    winners.push(cloneReaders(population[i - 1]));
                     break;
                 }
             }
@@ -264,17 +320,17 @@ GA.prototype = {
             mutation(winners[i], this.options.pm.value);
         }
 
-        this.population = winners;
+        population = winners;
 
         // get the best one from the new generation
-        this.population.forEach(function (s, i) {
+        population.forEach(function (s, i) {
             s.statistic = self.getStatistic(s, self.tags);
 
             // find best
             if (s.statistic.fitness > highestFitness) {
                 highestFitness = s.statistic.fitness;
 
-                self.readers = cloneReaders(s);
+                record.readers = cloneReaders(s);
             }
             // find wrost
             if (s.statistic.fitness < worst) {
@@ -284,12 +340,13 @@ GA.prototype = {
             }
         });
 
-        this.population[worstPos] = cloneReaders(this.readers);
+        population[worstPos] = cloneReaders(record.readers);
 
         this.check();
 
-        this.records.avg.push(sum / len);
-        this.records.highest.push(highestFitness);
+        record.avg.push(sum / len);
+        record.highest.push(highestFitness);
+        record.readers = cloneReaders(record.readers);
 
         return this;
     },
@@ -401,6 +458,13 @@ function Reader(x, y) {
     this.distance = [];
 }
 
+function Record(avg, highest, run, readers) {
+    this.avg = avg || [];
+    this.highest = highest || [];
+    this.run = run || {};
+    this.readers = readers || [];
+    this.population = [];
+}
 
 //helper functions
 function extend(obj) {
@@ -443,6 +507,15 @@ function cloneReaders (target) {
     var ret = [];
     ret = cloneArray(target);
     ret.statistic = clone(target.statistic);
+    return ret;
+}
+
+function cloneReaderArray(arr) {
+    var ret = [];
+    arr.forEach(function(v, i) {
+        ret.push(cloneReaders(v));
+    });
+
     return ret;
 }
 

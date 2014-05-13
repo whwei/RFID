@@ -294,16 +294,25 @@ ul li {
     outline: none;
 }
 .result-list .table-container {
-    height: calc(100% - 25px);
     overflow-y: auto;
 }
 .statistic {
     flex: 1;
     margin-bottom: 20px;
 }
+.statistic .table-container {
+    height: 240px;
+}
 .readers {
     flex: 1;
     margin-bottom: 20px;
+}
+.readers .table-container {
+    height: 120px;
+}
+
+.statistic-charts .chart .highcharts-container {
+    margin: 0 auto;
 }
 
 
