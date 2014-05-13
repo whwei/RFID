@@ -100,15 +100,15 @@ ul li {
 .layout {
     margin: 24px 0 0 20px;
     height: 100%;
-	display: -webkit-flex;
-	-webkit-justify-content: space-between;
-	-webkit-align-items: stretch;
+	display: flex;
+	justify-content: space-between;
+	align-items: stretch;
 }
 
 
 /*nav area*/
 .nav-main {
-	width: 20%;
+	width: 15%;
 }
 
 .nav-main .list-group-item {
@@ -146,7 +146,7 @@ ul li {
 /*main view*/
 .main-content {
     overflow: hidden;
-	width: 80%;
+	width: 85%;
     height: calc(100% - 24px);
 }
 
@@ -237,9 +237,9 @@ ul li {
     float: right;
 }
 .calculating-mask {
-    display: -webkit-flex;
-    -webkit-justify-content: center;
-    -webkit-align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
     left: 0; top: 0;
     height: 100%;
@@ -258,17 +258,15 @@ ul li {
     text-align: center;
 }
 .best-solution {
-    display: -webkit-flex;
-    -webkit-justify-content: space-between;
     margin-bottom: 30px;
 }
 .bubble-charts {
+    display: flex;
+    justify-content: space-around;
     flex: 1;
 }
 .result-list {
-    display: -webkit-flex;
-    -webkit-flex-direction: column;
-    width: 280px;
+    display: flex;
     margin-left: 40px;
 }
 .result-list h4 {
@@ -300,14 +298,12 @@ ul li {
     overflow-y: auto;
 }
 .statistic {
+    flex: 1;
     margin-bottom: 20px;
 }
 .readers {
+    flex: 1;
     margin-bottom: 20px;
-}
-.update-statistic {
-    width: 200px;
-    margin: 0 auto;
 }
 
 

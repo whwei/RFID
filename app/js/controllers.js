@@ -111,8 +111,8 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                 $('#bubble-chart-origin').highcharts({
                     chart: {
                         type: 'bubble',
-                        width: 400,
-                        height: 400
+                        width: 360,
+                        height: 360
                     },
                     credits: {
                         enabled: false
@@ -154,8 +154,8 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                 $('#bubble-chart-result').highcharts({
                     chart: {
                         type: 'bubble',
-                        width: 400,
-                        height: 400
+                        width: 360,
+                        height: 360
                     },
                     credits: {
                         enabled: false

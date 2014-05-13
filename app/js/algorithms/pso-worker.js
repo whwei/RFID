@@ -4,31 +4,31 @@ self.addEventListener('message', function (e) {
 
     switch (e.data.command) {
         case 'run':
-            var ga = new GA(e.data.options);
-            ga.init();
+            var pso = new PSO(e.data.options);
+            pso.init();
             self.postMessage({
                 type: 'result',
-                value: ga.run()
+                value: pso.run()
             });
             break;
         case 'getDefaultOption':
             self.postMessage({
                 type: 'options',
-                value: JSON.stringify(GA.prototype.options)
+                value: JSON.stringify(PSO.prototype.options)
             });
             break;
         case 'getStatistic':
             self.postMessage({
                 type: 'statistic',
-                value: JSON.stringify((new GA(e.data.options)).getStatistic(e.data.cfgReaders, e.data.tags))
+                value: JSON.stringify((new PSO(e.data.options)).getStatistic(e.data.cfgReaders, e.data.tags))
             });
             break;
     }
 }, false);
 
 
-var GA = function (op) {
-    this.options = extend({}, GA.prototype.options, op); // simulation params
+var PSO = function (op) {
+    this.options = extend({}, PSO.prototype.options, op); // simulation params
     this.status = {
         initialized: false,
         iteration: 0
@@ -43,7 +43,7 @@ var GA = function (op) {
 
 };
 
-GA.prototype = {
+PSO.prototype = {
     options:  {
         rn: {
             name: 'rn',
@@ -447,13 +447,16 @@ function cloneReaders (target) {
 }
 
 function distance(p1, p2) {
-
+    try{
     if (check(p1.x) && check(p1.y) && check(p2.x) && check(p2.y)) {
         return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
     }
-
+    } catch (e) {
+//        console.error(e);
+//        console.error(p1, p2);
+    }
     function check(n) {
-        return n >= 0 && (n <= GA.prototype.options.xsize.value || n <= GA.prototype.options.ysize.value);
+        return n >= 0 && (n <= PSO.prototype.options.xsize.value || n <= PSO.prototype.options.ysize.value);
     }
     return null;
 }
@@ -497,7 +500,7 @@ function mutation(g, pm) {
 
     for (i = 0; i < len; i++) {
         if (Math.random() <= pm) {
-            g[i] = new Reader(randomNumber(0, GA.prototype.options.xsize.value), randomNumber(0, GA.prototype.options.ysize.value));
+            g[i] = new Reader(randomNumber(0, PSO.prototype.options.xsize.value), randomNumber(0, PSO.prototype.options.ysize.value));
         }
     }
 }
