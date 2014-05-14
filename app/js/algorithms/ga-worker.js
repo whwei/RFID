@@ -249,11 +249,9 @@ GA.prototype = {
             });
         }
 
-        this.population = this.initPopulation();
-        this.initialPopulation = cloneReaderArray(this.population);
+        this.initPopulation();
 
-        this.readers = this.initReaders();
-        this.initialReaders = cloneReaders(this.readers);
+        this.initReaders();
 
         this.status.initialized = true;
 
@@ -276,6 +274,7 @@ GA.prototype = {
         }
 
         this.population = population;
+        this.initialPopulation = cloneReaderArray(this.population);
 
         return population;
     },
@@ -292,6 +291,8 @@ GA.prototype = {
         }
 
         readers.statistic = this.getStatistic(readers, this.tags);
+        this.readers = readers;
+        this.initialReaders = cloneReaders(this.readers);
 
         return readers;
     },
