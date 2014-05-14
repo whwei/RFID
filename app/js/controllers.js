@@ -24,6 +24,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
 	$scope.algo = $routeParams.algo;
     $scope.resultReturned = false;
     $scope.calculating = '';
+    $scope.runMode = '';
 
     // tab setting
     $scope.tabs = {simulate: 'current', result: ''};
@@ -34,6 +35,10 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
 
     wk.postMessage({
         command: 'getDefaultOption'
+    });
+
+    wk.postMessage({
+        command: 'getMode'
     });
 
     // bind worker event
@@ -71,9 +76,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     yAxis: {
                         title: {
                             text: 'Fitness'
-                        },
-                        min: 0,
-                        max: 1
+                        }
                     },
                     legend: {
                         enabled: false
@@ -107,7 +110,6 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                         data: e.data.value.records[e.data.value.records.bestPos].highest
                     }]
                 });
-
 
                 $('#bubble-chart-origin').highcharts({
                     chart: {
@@ -206,11 +208,21 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
                     if (ret.hasOwnProperty(p)) {
                         if (ret[p].optional === true) {
                             opts[p] = ret[p];
+                            opts[p].disabled = false;
                         }
                     }
                 }
 
                 scope.options = opts;
+            });
+        } else if (e.data.type === 'mode') {
+            $scope.$apply(function(scope) {
+                scope.modes = JSON.parse(e.data.value);
+                for (var p in scope.modes) {
+                    if (scope.modes[p].default) {
+                        scope.runMode = p;
+                    }
+                }
             });
         } else if (e.data.type === 'statistic') {
             $scope.$apply(function(scope) {
@@ -316,11 +328,17 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
     $scope.simulate = function () {
         $scope.calculating = 'calculating-show';
 
-        // run worker
-        wk.postMessage({
-            command: 'run',
-            options: $scope.options
-        });
+        if ($scope.options){
+            // run worker
+            wk.postMessage({
+                command: 'run',
+                options: $scope.options,
+                mode: {
+                    name: $scope.runMode,
+                    requirements: $scope.modes[$scope.runMode].requirements
+                }
+            });
+        }
     };
 
 

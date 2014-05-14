@@ -1,10 +1,12 @@
 {
-  "name": "RFID-sml",
-  "version": "0.0.1",
-  "main": "index.html",
-  "window": {
-    "toolbar": true,
-    "width": 1000,
-    "height": 600
-  }
+    "name": "RFID-sml",
+    "version": "0.0.1",
+    "main": "index.html",
+    "window": {
+        "toolbar": true,
+        "frame": true,
+        "resizable": false,
+        "width": 1000,
+        "height": 600
+    }
 }

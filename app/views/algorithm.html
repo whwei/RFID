@@ -9,13 +9,27 @@
     <div class="simulate animate-switch" ng-class="panels.simulate">
         <div class="goal-setting">
             <h3>优化目标</h3>
-
+            <div class="col-container">
+                <div ng-repeat="mode in modes">
+                    <label for="{{ mode.name }}">
+                        <input type="radio" id="{{ mode.name }}" ng-checked="mode.default" name="runMode" ng-model="$parent.runMode" value="{{ mode.name }}">
+                        {{ mode.desc }}
+                    </label>
+                    <div class="rq">
+                        <span ng-repeat="rq in mode.requirements">
+                            <label for="{{ rq.name }}">{{ rq.desc }}</label>
+                            <input type="text" id="{{ rq.name }}" ng-model="rq.value" />
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="param-setting">
             <h3>模拟参数</h3>
             <div class="col-container">
                 <div class="options" ng-repeat="option in options">
-                    <label for="{{option.name}}">{{option.desc}}</label><input type="text" id="{{option.name}}" ng-model="option.value" />
+                    <label for="{{option.name}}">{{option.desc}}</label>
+                    <input ng-disabled="option.disabled" type="text" id="{{option.name}}" ng-model="option.value" />
                 </div>
             </div>
         </div>
@@ -23,7 +37,12 @@
             <button class="btn-primary" ng-click="simulate()">模拟</button>
         </div>
         <div class="calculating-mask" ng-class="calculating">
-            <p>计算中...</p>
+            <div>
+                <div>
+                    <img src="images/loader.gif" alt="loading"/>
+                </div>
+                计算中...
+            </div>
         </div>
     </div>
 
@@ -43,10 +62,12 @@
                         <table>
                             <tr><th>指标</th><th>数值</th></tr>
                             <tr><td>运行次数</td><td>{{ result.options.rpt.value }}</td></tr>
+                            <tr><td>平均读写器个数</td><td>{{ result.records.avgRn | number }}</td></tr>
                             <tr><td>平均运行时间（ms）</td><td>{{ result.records.avgTime | number }}</td></tr>
                             <tr><td>平均适应度</td><td>{{ result.records.avgFitness | number }}</td></tr>
-                            <tr><td>均方差</td><td>{{ result.records.mse }}</td></tr>
-                            <tr><td>最好适应度</td><td>{{ result.readers.statistic.fitness | number }}</td></tr>
+                            <tr><td>得到最优解迭代次数</td><td>{{ (result.records.avgIte + 1).toFixed(0) }}</td></tr>
+                            <tr><td>均方差</td><td>{{ result.records.mse.toExponential(3) }}</td></tr>
+                            <tr><td>最高适应度</td><td>{{ result.readers.statistic.fitness | number }}</td></tr>
                         </table>
                     </div>
                 </div>

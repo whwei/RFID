@@ -8,13 +8,19 @@ self.addEventListener('message', function (e) {
             ga.init();
             self.postMessage({
                 type: 'result',
-                value: ga.run()
+                value: ga.run(e.data.mode.name, e.data.mode.requirements)
             });
             break;
         case 'getDefaultOption':
             self.postMessage({
                 type: 'options',
                 value: JSON.stringify(GA.prototype.options)
+            });
+            break;
+        case 'getMode':
+            self.postMessage({
+                type: 'mode',
+                value: JSON.stringify(GA.prototype.mode)
             });
             break;
         case 'getStatistic':
@@ -43,6 +49,88 @@ var GA = function (op) {
 };
 
 GA.prototype = {
+    mode: {
+        maxCoverage: {
+            name: 'maxCoverage',
+            desc: '最大化覆盖率',
+            default: false
+        },
+        balance: {
+            name: 'balance',
+            desc: '负载均衡',
+            default: false
+        },
+        minInterference: {
+            name: 'minInterference',
+            desc: '最小化干扰',
+            default: false
+        },
+        minReader: {
+            name: 'minReader',
+            desc: '最小化读写器',
+            default: true,
+            requirements: {
+                coverage: {
+                    name: 'coverage',
+                    desc: '覆盖率',
+                    value: 0.8
+                },
+                maxRn: {
+                    name: 'maxRn',
+                    desc: '最大读写器数',
+                    value: 15
+                }
+            }
+        }
+    },
+    runMode: {
+        maxCoverage: function () {
+            var i;
+            for(i = 0; i < this.options.rpt.value; i++) {
+                this.records[i] = this.records[i] || new Record(null, null, null, cloneReaders(this.initialReaders), cloneReaderArray(this.initialPopulation));
+                this.runOnce(this.records[i]);
+            }
+        },
+        balance: function () {
+            var i;
+            for(i = 0; i < this.options.rpt.value; i++) {
+                this.records[i] = this.records[i] || new Record(null, null, null, cloneReaders(this.initialReaders), cloneReaderArray(this.initialPopulation));
+                this.runOnce(this.records[i]);
+            }
+        },
+        minInterference: function () {
+            var i;
+            for(i = 0; i < this.options.rpt.value; i++) {
+                this.records[i] = this.records[i] || new Record(null, null, null, cloneReaders(this.initialReaders), cloneReaderArray(this.initialPopulation));
+                this.runOnce(this.records[i]);
+            }
+        },
+        minReader: function (requirements) {
+            var i,
+                j;
+            for (i = 0; i < this.options.rpt.value; i++) {
+                for (j = 1; j < requirements.maxRn.value; j++) {
+                    this.options.rn.value = j;
+                    this.records[i] = new Record(
+                                            null,
+                                            null,
+                                            null,
+                                            cloneReaders(this.initReaders(j)),
+                                            cloneReaderArray(this.initPopulation(j))
+                                        );
+                    this.runOnce(this.records[i], function (record) {
+                        return record.readers.statistic.results[0].value >= requirements.coverage.value;
+                    });
+
+                    if (this.records[i].readers.statistic.results[0].value >= requirements.coverage.value) {
+                        break;
+                    }
+                }
+
+            }
+
+        }
+    },
     options:  {
         rn: {
             name: 'rn',
@@ -68,12 +156,12 @@ GA.prototype = {
             optional: true,
             value: 30
         },
-        r: {
-            name: 'r',
-            desc: '读写器覆盖范围',
-            optional: true,
-            value: 5
-        },
+//        r: {
+//            name: 'r',
+//            desc: '读写器覆盖范围',
+//            optional: true,
+//            value: 5
+//        },
         Gtx: {
             name: 'Gtx',
             desc: '天线增益',
@@ -144,7 +232,7 @@ GA.prototype = {
             name: 'rpt',
             desc: '运行次数',
             optional: true,
-            value: 1
+            value: 5
         }
     },
     init: function () {
@@ -161,39 +249,58 @@ GA.prototype = {
             });
         }
 
-        // each reader has a random position
-        for (i = 0; i < this.options.m.value; i++) {
-            this.population[i] = [];
-            for (j = 0; j < this.options.rn.value; j++) {
-                this.population[i].push(new Reader(randomNumber(0, this.options.xsize.value),randomNumber(0, this.options.ysize.value)));
-            }
-        }
+        this.population = this.initPopulation();
+        this.initialPopulation = cloneReaderArray(this.population);
 
-        // random position for readers(best solution)
-        for (i = 0; i < this.options.rn.value; i++) {
-            var nrd = new Reader(randomNumber(0, this.options.xsize.value), randomNumber(0, this.options.ysize.value));
-            this.readers.push(nrd);
-            this.initialReaders.push(clone(nrd));
-        }
-
-        // initialize each run
-        for (i = 0; i < this.options.rpt.value; i++) {
-            this.records[i] = new Record();
-            this.records[i].readers = cloneReaders(this.readers);
-            this.records[i].population = cloneReaderArray(this.population);
-        }
-
-        this.initialReaders.statistic = this.getStatistic(this.initialReaders, this.tags);
+        this.readers = this.initReaders();
+        this.initialReaders = cloneReaders(this.readers);
 
         this.status.initialized = true;
 
         return this;
+    },
+    initPopulation: function (rn, m) {
+        var i,
+            j,
+            population = [];
+
+        m = m || this.options.m.value;
+        rn = rn || this.options.rn.value;
+
+        // each reader has a random position
+        for (i = 0; i < m; i++) {
+            population[i] = [];
+            for (j = 0; j < rn; j++) {
+                population[i].push(new Reader(randomNumber(0, this.options.xsize.value),randomNumber(0, this.options.ysize.value)));
+            }
+        }
+
+        this.population = population;
+
+        return population;
+    },
+    initReaders: function(rn) {
+        var i,
+            readers = [];
+
+        rn = rn || this.options.rn.value;
+
+        // random position for readers(best solution)
+        for (i = 0; i < rn; i++) {
+            var nrd = new Reader(randomNumber(0, this.options.xsize.value), randomNumber(0, this.options.ysize.value));
+            readers.push(nrd);
+        }
+
+        readers.statistic = this.getStatistic(readers, this.tags);
+
+        return readers;
     },
     reset: function () {
         this.population = [];
         this.tags = [];
         this.readers = [];
         this.initialReaders = [];
+        this.initialPopulation = [];
         this.elements = [];
         this.records = [];
         this.records.bestPos = 0;
@@ -201,25 +308,30 @@ GA.prototype = {
         this.status.initialized = false;
         this.status.repetition = 0;
     },
-    run: function() {
-        var i;
-
-        for(i = 0; i < this.options.rpt.value; i++) {
-            this.runOnce(this.records[i]);
-        }
+    run: function(mode, requirements) {
+        this.runMode[mode || 'maxCoverage'].call(this, requirements);
 
         this.simulationStatistic();
 
+        this.records.mode = {
+            mode: mode,
+            requirements: requirements
+        };
+
         return this;
     },
-    runOnce: function(record, it) {
+    runOnce: function(record, ck) {
         var i,
-            len = it || this.options.iterations.value;
+            len = this.options.iterations.value;
 
         var st = +new Date();
+        record.run.getBestIte = 0;
         for (i = 0; i < len; i++) {
-            this.iterator(record);
             this.status.iteration = i;
+            this.iterator(record);
+            if (ck && ck.call(this, record)) {
+                break;
+            }
         }
         var et = +new Date();
         var duration = et - st;
@@ -235,6 +347,8 @@ GA.prototype = {
             best = 0,
             sumFitness = 0,
             sumTime = 0,
+            sumIte = 0,
+            sumRn = 0,
             mse = 0,
             rpt = this.options.rpt.value;
 
@@ -252,10 +366,21 @@ GA.prototype = {
 
             // avg time
             sumTime += r.run.total;
+
+            // avg iteration to get best solution
+            sumIte += r.run.getBestIte;
+
+            // for minReader object, avg min reader to achive the goal
+            sumRn += r.readers.length;
+
         }
 
         this.records.avgFitness = sumFitness / rpt;
         this.records.avgTime = sumTime / rpt;
+        this.records.avgIte = sumIte / rpt;
+        this.records.avgRn = sumRn / rpt;
+        this.records.options = clone(this.options);
+        this.records.tags = cloneArray(this.tags);
 
         for(j = 0; j < rpt; j++) {
             mse += Math.pow(this.records[j].readers.statistic.fitness - this.records.avgFitness, 2);
@@ -331,6 +456,7 @@ GA.prototype = {
                 highestFitness = s.statistic.fitness;
 
                 record.readers = cloneReaders(s);
+                record.run.getBestIte = self.status.iteration;
             }
             // find wrost
             if (s.statistic.fitness < worst) {
@@ -342,17 +468,11 @@ GA.prototype = {
 
         population[worstPos] = cloneReaders(record.readers);
 
-        this.check();
-
         record.avg.push(sum / len);
         record.highest.push(highestFitness);
         record.readers = cloneReaders(record.readers);
 
         return this;
-    },
-    // check if the current solution meet the requirement
-    check: function () {
-
     },
     // received power of tag from reader
     getPower: function (reader, tag, it) {
@@ -458,12 +578,12 @@ function Reader(x, y) {
     this.distance = [];
 }
 
-function Record(avg, highest, run, readers) {
+function Record(avg, highest, run, readers, population) {
     this.avg = avg || [];
     this.highest = highest || [];
     this.run = run || {};
     this.readers = readers || [];
-    this.population = [];
+    this.population = population || [];
 }
 
 //helper functions
