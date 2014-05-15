@@ -46,6 +46,7 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
 
         if (e.data.type === 'result'){
             $scope.$apply(function(scope) {
+                console.log(e.data.value);
                 scope.result = e.data.value;
                 scope.generations = e.data.value.records;
                 scope.cfgReaders = cloneReaders(e.data.value.readers);

@@ -53,7 +53,7 @@ GA.prototype = {
         maxCoverage: {
             name: 'maxCoverage',
             desc: '最大化覆盖率',
-            default: false
+            default: true
         },
         balance: {
             name: 'balance',
@@ -68,7 +68,7 @@ GA.prototype = {
         minReader: {
             name: 'minReader',
             desc: '最小化读写器',
-            default: true,
+            default: false,
             requirements: {
                 coverage: {
                     name: 'coverage',
