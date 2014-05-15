@@ -17,6 +17,12 @@ app.factory('saverFactory', function () {
     return sv;
 });
 
+app.factory('storageFactory', function () {
+    var storage = require('../node_modules/node-persist');
+window.storage = storage;
+    return storage;
+});
+
 app.factory('algorithmInfoFactory', function () {
     var ai = {};
 

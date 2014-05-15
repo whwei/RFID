@@ -20,298 +20,127 @@ appControllers.controller('indexController', function ($scope) {
 
 });
 
-appControllers.controller('algorithmController', function ($scope, $routeParams, $location) {
-	$scope.algo = $routeParams.algo;
-    $scope.resultReturned = false;
+appControllers.controller('algorithmController', function ($scope, $routeParams, $location, storageFactory) {
+    var storeName = $routeParams.algo + 'Store';
+    storageFactory.initSync();
+
+    $scope.algo = $routeParams.algo;
+    $scope.cleanHistory = false;
+    $scope.optionLoaded = false;
     $scope.calculating = '';
     $scope.runMode = '';
+    $scope.history = storageFactory.getItem(storeName);
 
-    // tab setting
+        // tab setting
     $scope.tabs = {simulate: 'current', result: ''};
     $scope.panels = {simulate: 'show', result: ''};
 
+
     // get worker
-    var wk = new Worker('js/algorithms/' + $scope.algo + '-worker.js');
+    var wk = new Worker('js/algorithms/' + $scope.algo + '-worker.js'),
+        optionPromise;
 
-    wk.postMessage({
-        command: 'getDefaultOption'
-    });
-
-    wk.postMessage({
-        command: 'getMode'
-    });
-
-    // bind worker event
-    wk.addEventListener('message', function (e) {
-
-        if (e.data.type === 'result'){
-            $scope.$apply(function(scope) {
-                console.log(e.data.value);
-                scope.result = e.data.value;
-                scope.generations = e.data.value.records;
-                scope.cfgReaders = cloneReaders(e.data.value.readers);
-                scope.resultReturned = true;
-
-                var readers = e.data.value.readers.map(function (v, i) {
-                    return {x: +v.x, y: +v.y, z: 2};
-                });
-                var tags = e.data.value.tags.map(function (v, i) {
-                    return {x: +v.x, y: +v.y, z: 1};
-                });
-                console.log(e.data.value);
-
-                $('#highest').highcharts({
-                    chart: {
-                        zoomType: 'x'
-                    },
-                    credits: {
-                        enabled: false
-                    },
-                    title: {
-                        text: 'Fitness 收敛图' + (e.data.value.records.bestPos !== 0 ? '（第' + (e.data.value.records.bestPos + 1) + '次模拟）' : '')
-                    },
-                    xAxis: {
-                        type: 'linear',
-                        minRange: 1
-                    },
-                    yAxis: {
-                        title: {
-                            text: 'Fitness'
-                        }
-                    },
-                    legend: {
-                        enabled: false
-                    },
-                    plotOptions: {
-                        area: {
-                            fillColor: {
-                                linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
-                                stops: [
-                                    [0, Highcharts.getOptions().colors[0]],
-                                    [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
-                                ]
-                            },
-                            marker: {
-                                radius: 2
-                            },
-                            lineWidth: 1,
-                            states: {
-                                hover: {
-                                    lineWidth: 1
-                                }
-                            },
-                            threshold: null
-                        }
-                    },
-                    series: [{
-                        type: 'area',
-                        name: 'Fitness',
-                        pointInterval: 1,
-                        pointStart: 1,
-                        data: e.data.value.records[e.data.value.records.bestPos].highest
-                    }]
-                });
-
-                $('#bubble-chart-origin').highcharts({
-                    chart: {
-                        type: 'bubble',
-                        width: 360,
-                        height: 360
-                    },
-                    credits: {
-                        enabled: false
-                    },
-                    xAxis: {
-                        tickInterval: 5,
-                        gridLineWidth: 1,
-                        min: 0,
-                        max: $scope.options.xsize.value
-                    },
-                    yAxis: {
-                        tickInterval: 5,
-                        min: 0,
-                        max: $scope.options.ysize.value,
-                        title: {
-                            text: null
-                        }
-                    },
-                    title: {
-                        text: '原始读写器分布'
-                    },
-                    plotOptions: {
-                        bubble: {
-                            //maxSize: (200 * $scope.options.r.value / $scope.options.xsize.value) + '%',
-                            maxSize: 5,
-                            minSize: 3
-                        }
-                    },
-                    series: [{
-                        name: '读写器',
-                        data: $scope.result.initialReaders.map(function(v, i) {return [+v.x, +v.y, 2];}),
-                        sizeBy: 'width'
-                    },{
-                        name: '标签',
-                        data: $scope.result.tags.map(function(v, i) {return [+v.x, +v.y, 1];})
-                    }]
-                });
-
-                $('#bubble-chart-result').highcharts({
-                    chart: {
-                        type: 'bubble',
-                        width: 360,
-                        height: 360
-                    },
-                    credits: {
-                        enabled: false
-                    },
-                    xAxis: {
-                        gridLineWidth: 1,
-                        tickInterval: 5,
-                        min: 0,
-                        max: $scope.options.xsize.value
-                    },
-                    yAxis: {
-                        tickInterval: 5,
-                        min: 0,
-                        max: $scope.options.ysize.value,
-                        title: {
-                            text: null
-                        }
-                    },
-                    title: {
-                        text: '优化后读写器分布'
-                    },
-                    plotOptions: {
-                        bubble: {
-                            //maxSize: (200 * $scope.options.r.value / $scope.options.xsize.value) + '%',
-                            maxSize: 5,
-                            minSize: 3
-                        }
-                    },
-                    series: [{
-                        name: '读写器',
-                        data: readers,
-                        sizeBy: 'width'
-                    },{
-                        name: '标签',
-                        data: tags
-                    }]
-                });
-
-                $scope.switchTab('result');
-            });
-        } else if (e.data.type === 'options') {
-            $scope.$apply(function(scope) {
-                var opts = {},
-                    ret = JSON.parse(e.data.value);
-
-                for (var p in ret) {
-                    if (ret.hasOwnProperty(p)) {
-                        if (ret[p].optional === true) {
-                            opts[p] = ret[p];
-                            opts[p].disabled = false;
-                        }
-                    }
-                }
-
-                scope.options = opts;
-            });
-        } else if (e.data.type === 'mode') {
-            $scope.$apply(function(scope) {
-                scope.modes = JSON.parse(e.data.value);
-                for (var p in scope.modes) {
-                    if (scope.modes[p].default) {
-                        scope.runMode = p;
-                    }
-                }
-            });
-        } else if (e.data.type === 'statistic') {
-            $scope.$apply(function(scope) {
-                scope.cfgReaders.statistic = JSON.parse(e.data.value);
-
-                $('#bubble-chart-result').highcharts({
-                    chart: {
-                        type: 'bubble',
-                        width: 400,
-                        height: 400
-                    },
-                    credits: {
-                        enabled: false
-                    },
-                    xAxis: {
-                        tickInterval: 5,
-                        gridLineWidth: 1,
-                        min: 0,
-                        max: $scope.options.xsize.value
-                    },
-                    yAxis: {
-                        tickInterval: 5,
-                        max: $scope.options.ysize.value,
-                        title: {
-                            text: null
-                        }
-                    },
-                    title: {
-                        text: null
-                    },
-                    plotOptions: {
-                        bubble: {
-                            //maxSize: (200 * $scope.options.r.value / $scope.options.xsize.value) + '%',
-                            maxSize: 5,
-                            minSize: 3
-                        }
-                    },
-                    series: [{
-                        name: '读写器',
-                        sizeBy: 'width',
-                        data: scope.cfgReaders.map(function(v, i) {return [+v.x, +v.y, 2];})
-                    },{
-                        name: '标签',
-                        data: scope.result.tags.map(function(v, i) {return [+v.x, +v.y, 1];})
-                    }]
-                });
-            });
-
-        }
-
-        $scope.$apply(function(scope) {
-            scope.calculating = '';
+    optionPromise = new Promise(function (resolve, reject) {
+        wk.postMessage({
+            command: 'getMode'
         });
 
-        // helper function
-        function clone(myObj){
-            if(typeof(myObj) !== 'object' || myObj === null) {
-                return myObj;
+        wk.postMessage({
+            command: 'getDefaultOption'
+        });
+
+        // bind worker event
+        wk.addEventListener('message', function (e) {
+            if (e.data.type === 'result'){
+                $scope.$apply(function(scope) {
+                    $scope.cleanHistory = false;
+                    scope.result = e.data.value;
+                    scope.generations = e.data.value.records;
+                    scope.cfgReaders = cloneReaders(e.data.value.readers);
+                    scope.resultReturned = true;
+
+                    initResult(e.data.value);
+
+
+                    // save records
+                    $scope.history = $scope.history || [];
+
+                    $scope.currentRecord = {
+                        records: e.data.value.records,
+                        runData: e.data.value.runData
+                    };
+
+                    $scope.history.push($scope.currentRecord);
+
+                    saveData($scope.history);
+
+                    $scope.switchTab('result');
+
+                    function saveData(store) {
+                        storageFactory.setItem(storeName, store);
+                    }
+
+                });
+            } else if (e.data.type === 'options') {
+                $scope.$apply(function(scope) {
+                    var opts = {},
+                        ret = JSON.parse(e.data.value);
+
+                    for (var p in ret) {
+                        if (ret.hasOwnProperty(p)) {
+                            if (ret[p].optional === true) {
+                                opts[p] = ret[p];
+                                opts[p].disabled = false;
+                            }
+                        }
+                    }
+
+                    scope.options = opts;
+                    scope.optionLoaded = true;
+                    resolve();
+                });
+            } else if (e.data.type === 'mode') {
+                $scope.$apply(function(scope) {
+                    scope.modes = JSON.parse(e.data.value);
+                    for (var p in scope.modes) {
+                        if (scope.modes[p].default) {
+                            scope.runMode = p;
+                        }
+                    }
+                });
+            } else if (e.data.type === 'statistic') {
+                $scope.$apply(function(scope) {
+                    scope.cfgReaders.statistic = JSON.parse(e.data.value);
+
+                    initBubbleChart('#bubble-chart-result',
+                        null,
+                        scope.result.tags.map(function(v, i) {return [+v.x, +v.y, 1];}),
+                        scope.cfgReaders.map(function(v, i) {return [+v.x, +v.y, 2];})
+                    );
+
+                });
+
             }
 
-            var newObj = {};
-            for(var i in myObj){
-                newObj[i] = clone(myObj[i]);
-            }
-            return newObj;
-        }
-
-        function cloneArray(arr) {
-            var ret = [];
-            arr.forEach(function(v, i) {
-                if (typeof(v) === 'object') {
-                    ret.push(clone(v));
-                } else {
-                    ret.push(v);
-                }
+            $scope.$apply(function(scope) {
+                scope.calculating = '';
             });
 
-            return ret;
-        }
+        }, false);
+    });
 
-        function cloneReaders (target) {
-            var ret = [];
-            ret = cloneArray(target);
-            ret.statistic = clone(target.statistic);
-            return ret;
-        }
+    // display the last experiment result, if there is one
+    if ($scope.history) {
+        $scope.currentRecord = $scope.history[$scope.history.length - 1];
 
-    }, false);
+        optionPromise.then(function(){
+            initResult($scope.currentRecord);
+        });
+
+    } else {
+        $scope.history = [];
+        $scope.cleanHistory = true;
+    }
 
     $scope.switchTab = function (n) {
         for (var p in $scope.tabs) {
@@ -342,6 +171,35 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
         }
     };
 
+    function initResult(target) {
+        var result = {};
+
+        result.records = target.records;
+        result.options = target.runData.options;
+        result.runData = target.runData;
+        result.readers = target.runData.readers;
+        result.readers.statistic = target.runData.readerStatistic;
+        result.initialReaders = target.runData.initialReaders;
+        result.tags = target.runData.tags;
+        $scope.cfgReaders = cloneReaders(result.readers);
+        $scope.result = result;
+
+        initTimeChart('#highest',
+            'Fitness 收敛图' + (result.runData.bestPos !== 0 ? '（第' + (result.runData.bestPos + 1) + '次模拟）' : ''),
+            result.records[result.runData.bestPos].highest
+        );
+        initBubbleChart('#bubble-chart-origin',
+            '原始读写器分布',
+            $scope.result.tags.map(function(v, i) {return [+v.x, +v.y, 1];}),
+            $scope.result.initialReaders.map(function(v, i) {return [+v.x, +v.y, 2];})
+        );
+        initBubbleChart('#bubble-chart-result',
+            '优化后读写器分布',
+            result.tags.map(function (v, i) {return {x: +v.x, y: +v.y, z: 1};}),
+            result.readers.map(function (v, i) {return {x: +v.x, y: +v.y, z: 2};})
+        );
+
+    }
 
     $scope.updateStatistic = function () {
         wk.postMessage({
@@ -351,6 +209,144 @@ appControllers.controller('algorithmController', function ($scope, $routeParams,
             tags: $scope.result.tags
         });
     };
+
+    $scope.$watch('currentRecord', function (value) {
+        if (value && $scope.optionLoaded) {
+            initResult(value);
+        }
+    });
+
+    function initBubbleChart(selector, title, tags, readers) {
+        $(selector).highcharts({
+            chart: {
+                type: 'bubble',
+                width: 400,
+                height: 400
+            },
+            credits: {
+                enabled: false
+            },
+            xAxis: {
+                tickInterval: 5,
+                gridLineWidth: 1,
+                min: 0,
+                max: $scope.options.xsize.value
+            },
+            yAxis: {
+                tickInterval: 5,
+                min: 0,
+                max: $scope.options.ysize.value,
+                title: {
+                    text: null
+                }
+            },
+            title: {
+                text: title
+            },
+            plotOptions: {
+                bubble: {
+                    //maxSize: (200 * $scope.options.r.value / $scope.options.xsize.value) + '%',
+                    maxSize: 5,
+                    minSize: 3
+                }
+            },
+            series: [{
+                name: '读写器',
+                sizeBy: 'width',
+                data: readers
+            },{
+                name: '标签',
+                data: tags
+            }]
+        });
+    }
+
+    function initTimeChart(selector, title, data) {
+        $(selector).highcharts({
+            chart: {
+                zoomType: 'x'
+            },
+            credits: {
+                enabled: false
+            },
+            title: {
+                text: title
+            },
+            xAxis: {
+                type: 'linear',
+                minRange: 1
+            },
+            yAxis: {
+                title: {
+                    text: 'Fitness'
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                area: {
+                    fillColor: {
+                        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1},
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    lineWidth: 1,
+                    states: {
+                        hover: {
+                            lineWidth: 1
+                        }
+                    },
+                    threshold: null
+                }
+            },
+            series: [{
+                type: 'area',
+                name: 'Fitness',
+                pointInterval: 1,
+                pointStart: 1,
+                data: data
+            }]
+        });
+    }
+
+    // helper function
+    function clone(myObj){
+        if(typeof(myObj) !== 'object' || myObj === null) {
+            return myObj;
+        }
+
+        var newObj = {};
+        for(var i in myObj){
+            newObj[i] = clone(myObj[i]);
+        }
+        return newObj;
+    }
+
+    function cloneArray(arr) {
+        var ret = [];
+        arr.forEach(function(v, i) {
+            if (typeof(v) === 'object') {
+                ret.push(clone(v));
+            } else {
+                ret.push(v);
+            }
+        });
+
+        return ret;
+    }
+
+    function cloneReaders (target) {
+        var ret = [];
+        ret = cloneArray(target);
+        ret.statistic = clone(target.statistic);
+        return ret;
+    }
 
 });
 

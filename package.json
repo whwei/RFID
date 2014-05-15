@@ -3,20 +3,20 @@
   "version": "0.0.0",
   "description": "",
   "keywords": [],
-  
-    "homepage": "https://github.com/whwei/RFID",
-    "bugs": "https://github.com/whwei/RFID/issues",
-    "author": {
-      "name": "",
-      "email": "",
-      "url": "https://github.com/whwei"
-    },
-    "repository": {
-      "type": "git",
-      "url": "git://github.com/whwei/RFID.git"
-    },
-  
-  "dependencies": {},
+  "homepage": "https://github.com/whwei/RFID",
+  "bugs": "https://github.com/whwei/RFID/issues",
+  "author": {
+    "name": "",
+    "email": "",
+    "url": "https://github.com/whwei"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/whwei/RFID.git"
+  },
+  "dependencies": {
+    "node-persist": "0.0.2"
+  },
   "devDependencies": {
     "matchdep": "~0.1.2",
     "grunt": "~0.4.1",

@@ -45,6 +45,7 @@ var PSO = function (op) {
     this.tags = [];
     this.v = [];
     this.records = [];
+    this.runData = {};
     this.records.bestPos = 0;
     this.status.repetition = 0;
 
@@ -349,7 +350,8 @@ PSO.prototype = {
         this.initialReaders = [];
         this.initialPopulation = [];
         this.records = [];
-        this.records.bestPos = 0;
+        this.runData = {};
+        this.runData.bestPos = 0;
         this.status.iteration = 0;
         this.status.initialized = false;
         this.status.repetition = 0;
@@ -359,7 +361,7 @@ PSO.prototype = {
 
         this.simulationStatistic();
 
-        this.records.mode = {
+        this.runData.mode = {
             mode: mode,
             requirements: requirements
         };
@@ -404,7 +406,7 @@ PSO.prototype = {
             if (r.readers.statistic.fitness > best) {
                 best = r.readers.statistic.fitness;
                 this.readers = cloneReaders(r.readers);
-                this.records.bestPos = j;
+                this.runData.bestPos = j;
             }
 
             // avg fitness
@@ -421,17 +423,23 @@ PSO.prototype = {
 
         }
 
-        this.records.avgFitness = sumFitness / rpt;
-        this.records.avgTime = sumTime / rpt;
-        this.records.avgIte = sumIte / rpt;
-        this.records.avgRn = sumRn / rpt;
-        this.records.options = clone(this.options);
-        this.records.tags = cloneArray(this.tags);
+        this.runData.avgFitness = sumFitness / rpt;
+        this.runData.avgTime = sumTime / rpt;
+        this.runData.avgIte = sumIte / rpt;
+        this.runData.avgRn = sumRn / rpt;
+        this.runData.options = clone(this.options);
+        this.runData.tags = cloneArray(this.tags);
+        this.runData.readers = cloneReaders(this.readers);
+        this.runData.readerStatistic = clone(this.readers.statistic);
+        this.runData.initialReaders = cloneReaders(this.initialReaders);
+        this.runData.date = +new Date();
 
         for(j = 0; j < rpt; j++) {
-            mse += Math.pow(this.records[j].readers.statistic.fitness - this.records.avgFitness, 2);
+            mse += Math.pow(this.records[j].readers.statistic.fitness - this.runData.avgFitness, 2);
         }
-        this.records.mse = mse / rpt;
+        this.runData.mse = mse / rpt;
+
+
     },
     iterator: function (record) {
         var i,
@@ -705,50 +713,12 @@ function randomNumber(min, max) {
     return parseFloat((Math.random() * (max - min) + min).toFixed(3));
 }
 
-function cross(g1, g2, pc) {
-    var i,
-        temp,
-        len = g1 && g1.length,
-        len2 = g2 && g2.length;
-
-    if (!len || !len2 || len !== len2) {
-        console.error('array length unmatch');
-        return;
-    }
-
-    for (i = 0; i < len; i++) {
-        // cross x
-        if (Math.random() <= pc) {
-            temp = g1[i].x;
-            g1[i].x = g2[i].x;
-            g2[i].x = temp;
-        }
-        // cross y
-        if (Math.random() <= pc) {
-            temp = g1[i].y;
-            g1[i].y = g2[i].y;
-            g2[i].y = temp;
-        }
-    }
-}
-
-function mutation(g, pm) {
-    var i,
-        len = g && g.length;
-
-    for (i = 0; i < len; i++) {
-        if (Math.random() <= pm) {
-            g[i] = new Reader(randomNumber(0, PSO.prototype.options.xsize.value), randomNumber(0, PSO.prototype.options.ysize.value));
-        }
-    }
-}
-
 // standard normal distribution
 function rnd_snd() {
-    return (Math.random()*2-1)+(Math.random()*2-1)+(Math.random()*2-1);
+    return (Math.random() * 2 - 1) + (Math.random() * 2 - 1) + (Math.random() * 2 - 1);
 }
 
 // get normal distribution number with given 'mean' and 'stdev'. http://www.protonfish.com/random.shtml
 function rnd(mean, stdev) {
-    return rnd_snd()*stdev+mean;
+    return rnd_snd() * stdev + mean;
 }
