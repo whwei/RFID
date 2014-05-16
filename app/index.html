@@ -7,20 +7,28 @@
         <link rel="stylesheet" href="css/main.css">
         <link rel="stylesheet" href="bower_components/fontawesome/css/font-awesome.min.css"/>
     </head>
-    <body ng-controller="appController">
-        <div class="toolbar" ng-controller="appController">
+    <body>
+        <div class="toolbar" ng-controller="windowController">
             <button class="close" ng-click="closeWindow()"><span>&times;</span></button>
             <button class="min" ng-click="hideWindow()"><span>_</span></button>
         </div>
         <div class="layout">
             <div class="nav-main" ng-controller="navController">
                 <ul class="list-group">
-                  <li class="list-group-title">算法</li>
-                  <li ng-repeat="algo in algos">
-                    <a href="{{ algo.url }}" class="list-group-item list-algo" ng-class="algo.klass" ng-click="select(algo.url)">{{ algo.title }}</a>
-                  </li>
-                  <li class="list-group-title">算法设置</li>
-                  <li><a href="{{ addAlgo.url }}" class="list-group-item" ng-click="select(addAlgo.url)" ng-class="addAlgo.klass">{{ addAlgo.title }}</a></li>
+                    <li class="list-group-title">算法</li>
+                    <!--algorithm comparison-->
+                    <li>
+                        <a href="{{ compareAlgo.url }}" class="list-group-item" ng-click="select(compareAlgo.url)" ng-class="compareAlgo.klass">{{ compareAlgo.title }}</a>
+                    </li>
+                    <!--algorithms-->
+                    <li ng-repeat="algo in algos">
+                        <a href="{{ algo.url }}" class="list-group-item list-algo" ng-class="algo.klass" ng-click="select(algo.url)">{{ algo.title }}</a>
+                    </li>
+                    <!--alogrithm setting-->
+                    <li class="list-group-title">算法设置</li>
+                    <li>
+                        <a href="{{ addAlgo.url }}" class="list-group-item" ng-click="select(addAlgo.url)" ng-class="addAlgo.klass">{{ addAlgo.title }}</a>
+                    </li>
                 </ul>
             </div>
             <div class="main-content">
@@ -35,8 +43,16 @@
         <script src="js/angular-route.js"></script>
         <script src="js/angular-animate.js"></script>
         <script src="js/app.js"></script>
-        <script src="js/controllers.js"></script>
-
+        <script src="modules/window/windowController.js"></script>
+        <script src="modules/window/windowFactory.js"></script>
+        <script src="modules/nav/navController.js"></script>
+        <script src="modules/comparison/comparisonController.js"></script>
+        <script src="modules/algorithm/algorithmController.js"></script>
+        <script src="modules/algorithm/algorithmInfoFactory.js"></script>
+        <script src="modules/algorithm/algorithmFactory.js"></script>
+        <script src="modules/addAlgorithm/addController.js"></script>
+        <script src="modules/factory/saverFactory.js"></script>
+        <script src="modules/factory/storageFactory.js"></script>
     </body>
 </html>
 

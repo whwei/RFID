@@ -1,65 +1,27 @@
-'use strict';
+"use strict";
 
-var app = angular.module('app', ['ngRoute', 'ngAnimate', 'app.controllers']);
+angular.module('window', []);
+angular.module('addAlgorithm', []);
+angular.module('algorithm', []);
+angular.module('comparison', []);
+angular.module('commonFactory', []);
+angular.module('nav', []);
 
-app.factory('windowFactory', function () {
-    var gui = global.window.nwDispatcher.requireNwGui();
-    var win = gui.Window.get();
+var app = angular.module('app',
+    [
+        'ngRoute',
+        'ngAnimate',
+        'window',
+        'addAlgorithm',
+        'algorithm',
+        'comparison',
+        'commonFactory',
+        'nav'
+    ]);
 
-    return win;
-});
-
-app.factory('saverFactory', function () {
-    var sv = {};
-
-    sv.saver = require('./js/node/saver').saver;
-
-    return sv;
-});
-
-app.factory('storageFactory', function () {
-    var storage = require('../node_modules/node-persist');
-window.storage = storage;
-    return storage;
-});
-
-app.factory('algorithmInfoFactory', function () {
-    var ai = {};
-
-    ai.algorithmInfo = require('./js/node/algorithmInfo').algorithmInfo;
-    ai.algos = ai.algorithmInfo.loadAlgorithmInfo();
-    ai.algos.map(function (a, i) {
-        a.url = '#/algorithms/' + a.name;
-        a.klass = i === 0 ? 'current' : '';
-    });
-    ai.refresh = function () {
-        this.algos = this.algorithmInfo.loadAlgorithmInfo();
-        this.algos.map(function (a, i) {
-            a.url = '#/algorithms/' + a.name;
-            a.klass = i === 0 ? 'current' : '';
-        });
-        return this.algos;
-    };
-
-    return ai;
-});
-
-app.factory('algorithmFactory', function () {
-    var af = {};
-
-    var algorithmInfo = require('./js/node/algorithmInfo').algorithmInfo;
-
-    af.algos = algorithmInfo.loadAlgorithmInfo();
-    af.algos.map(function (a, i) {
-        a.url = '#/algorithms/' + a.name;
-        a.klass = i === 0 ? 'current' : '';
-    });
-
-    return af;
-});
 
 app.config(['$routeProvider', function($routeProvider){
-	$routeProvider
+    $routeProvider
 		.when('/algorithms/:algo', {
 			controller: 'algorithmController',
 			templateUrl: 'views/algorithm.html'
@@ -68,10 +30,10 @@ app.config(['$routeProvider', function($routeProvider){
             controller: 'addController',
             templateUrl: 'views/add-algorithm.html'
         })
-		.when('/', {
-			controller: 'indexController',
-			templateUrl: 'views/index.html'
+		.when('/comparison', {
+			controller: 'comparisonController',
+			templateUrl: 'views/comparison.html'
 		})
-		.otherwise({ redirectTo: '/'});
+		.otherwise({ redirectTo: '/comparison'});
 }]);
 

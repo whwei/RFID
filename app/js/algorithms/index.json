@@ -1,10 +1,10 @@
 [
 	{
 		"name": "ga",
-		"title": "遗传算法"
+		"title": "GA"
 	},
 	{
 		"name": "pso",
-		"title": "粒子群算法"
+		"title": "PSO"
 	}
 ]
