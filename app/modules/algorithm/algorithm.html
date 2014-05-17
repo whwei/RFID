@@ -1,9 +1,9 @@
 
 <div class="row content-nav">
-  <div>
-    <button ng-class="tabs.simulate" ng-click="switchTab('simulate')">算法模拟</button>
-    <button ng-class="tabs.result" ng-click="switchTab('result')">统计结果</button>
-  </div>
+    <div>
+        <button ng-class="tabs.simulate" ng-click="switchTab('simulate')">算法模拟</button>
+        <button ng-class="tabs.result" ng-click="switchTab('result')">统计结果</button>
+    </div>
 </div>
 <div class="animate-switch-container panels">
     <div class="simulate animate-switch" ng-class="panels.simulate">
@@ -91,7 +91,7 @@
                         <h4>读写器坐标</h4>
                         <div class="table-container">
                             <table>
-                                <tr><th>序号</th><th>x</th><th>y</th></tr>
+                                <tr><th>No.</th><th>x</th><th>y</th></tr>
                                 <tr ng-repeat="r in cfgReaders">
                                     <td>{{ $index+1 }}</td>
                                     <td><input type="text" value="{{ r.x | number }}" ng-model="r.x" /></td>

@@ -201,8 +201,8 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
         $(selector).highcharts({
             chart: {
                 type: 'bubble',
-                width: 400,
-                height: 400
+                width: 360,
+                height: 360
             },
             credits: {
                 enabled: false

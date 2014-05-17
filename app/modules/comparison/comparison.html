@@ -1,0 +1,13 @@
+<div class="comparison">
+    <div class="no-result" ng-show="empty">暂无数据</div>
+    <div ng-hide="empty">
+        <table class="records-selector">
+            <caption>选择对比记录</caption>
+            <tr><th>算法</th><th>模拟记录</th></tr>
+            <tr class="algo-record" ng-repeat="store in stores">
+                <td class="algo-name">{{ store.name | uppercase }}</td><td><select ng-model="store.currentRecord" ng-options="record.runData.date | date: 'yyyy/M/d H:m:s' for record in store.history"></select></td>
+            </tr>
+        </table>
+    </div>
+
+</div>

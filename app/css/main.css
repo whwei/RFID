@@ -43,6 +43,22 @@ ul li {
     padding: 0;
 }
 
+table {
+    width: 90%;
+    text-align: center;
+    border-collapse: collapse;
+    border: 1px solid rgba(200, 200, 200, .5);
+}
+
+table th,
+table td {
+    padding: 0 10px;
+    border: 1px solid rgba(200, 200, 200, .5);
+    overflow: hidden;
+    word-break: break-all;
+    text-overflow: ellipsis;
+}
+
 .btn-primary {
     padding: 5px 25px;
     border-radius: 3px;
@@ -133,6 +149,10 @@ ul li {
     color: #333;
 }
 
+.nav-main .list-group-title:first-of-type {
+    margin-top: 0;
+}
+
 .nav-main .list-group-item:hover {
     color: rgb(80, 150, 225);
 }
@@ -149,6 +169,8 @@ ul li {
 	text-align: center;
 }
 
+
+
 /*main view*/
 .main-content {
     overflow: hidden;
@@ -160,6 +182,21 @@ ul li {
     padding-left: 20px;
     height: 100%;
 }
+
+
+/*comparison*/
+.comparison table {
+    width: 50%;
+    margin: 0 auto;
+}
+.comparison caption {
+    padding-bottom: 10px;
+    text-align: left;
+    font-weight: bold;
+}
+
+
+
 
 /*algorithm*/
 .content-nav {
@@ -307,27 +344,19 @@ ul li {
 .result-list h4 {
     margin: 0 0 5px;
 }
-.result-list table {
-    width: 90%;
-    text-align: center;
-    border-collapse: collapse;
-    border: 1px solid rgba(200, 200, 200, .5);
-}
-.result-list table th,
-.result-list table td {
-    padding: 0 10px;
-    width: 33%;
-    border: 1px solid rgba(200, 200, 200, .5);
-    overflow: hidden;
-    word-break: break-all;
-    text-overflow: ellipsis;
-}
+
 .result-list input {
     width: 80%;
     border: 0;
     text-align: center;
     outline: none;
 }
+
+.result-list th,
+.result-list td {
+    width: 33%;
+}
+
 .result-list .table-container {
     overflow-y: auto;
 }

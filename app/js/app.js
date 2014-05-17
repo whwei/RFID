@@ -24,15 +24,15 @@ app.config(['$routeProvider', function($routeProvider){
     $routeProvider
 		.when('/algorithms/:algo', {
 			controller: 'algorithmController',
-			templateUrl: 'views/algorithm.html'
+			templateUrl: 'modules/algorithm/algorithm.html'
 		})
         .when('/add', {
             controller: 'addController',
-            templateUrl: 'views/add-algorithm.html'
+            templateUrl: 'modules/addAlgorithm/add-algorithm.html'
         })
 		.when('/comparison', {
 			controller: 'comparisonController',
-			templateUrl: 'views/comparison.html'
+			templateUrl: 'modules/comparison/comparison.html'
 		})
 		.otherwise({ redirectTo: '/comparison'});
 }]);
