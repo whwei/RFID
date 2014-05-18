@@ -32,6 +32,7 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
         // bind worker event
         wk.addEventListener('message', function (e) {
             if (e.data.type === 'result'){
+                console.log(e.data.value);
                 $scope.$apply(function(scope) {
                     $scope.cleanHistory = false;
                     scope.result = e.data.value;

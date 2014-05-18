@@ -8,6 +8,16 @@
                 <td class="algo-name">{{ store.name | uppercase }}</td><td><select ng-model="store.currentRecord" ng-options="record.runData.date | date: 'yyyy/M/d H:m:s' for record in store.history"></select></td>
             </tr>
         </table>
+        <table class="options-comparison">
+            <caption>模拟参数</caption>
+            <tr><th>算法</th><th>记录</th><th></th></tr>
+        </table>
+        <!--<div id="column-drilldown-chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>-->
+        <!--<pre id="cd-tsv" style="display:none"></pre>-->
+        <div id="column-chart-avgFitness" class="chart"></div>
+        <div id="column-chart-avgTime" class="chart"></div>
+        <div id="column-chart-avgIte" class="chart"></div>
+        <div id="column-chart-mse" class="chart"></div>
     </div>
 
 </div>

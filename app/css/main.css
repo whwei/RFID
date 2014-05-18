@@ -173,26 +173,35 @@ table td {
 
 /*main view*/
 .main-content {
-    overflow: hidden;
+    overflow-x: hidden;
 	width: 85%;
     height: calc(100% - 24px);
 }
-
 .slide {
     padding-left: 20px;
     height: 100%;
 }
+.no-result {
+    padding: 50px 0;
+    text-align: center;
+}
 
 
 /*comparison*/
-.comparison table {
+.comparison {
+    padding-bottom: 50px;
+}
+.comparison .records-selector {
     width: 50%;
     margin: 0 auto;
 }
-.comparison caption {
+.comparison .records-selector caption {
     padding-bottom: 10px;
     text-align: left;
     font-weight: bold;
+}
+.comparison .chart {
+    margin: 50px;
 }
 
 
@@ -324,10 +333,6 @@ table td {
 .calculating-show {
     opacity: 1;
     pointer-events: auto;
-}
-.panels .no-result {
-    padding: 50px 0;
-    text-align: center;
 }
 .best-solution {
     margin-bottom: 30px;

@@ -512,7 +512,7 @@ PSO.prototype = {
             if (tempx.statistic.fitness > gbest.statistic.fitness) {
                 record.readers = cloneReaders(tempx);
                 highestFitness = tempx.statistic.fitness;
-                record.getBestIte = self.status.iteration;
+                record.run.getBestIte = self.status.iteration;
             }
 
         }
