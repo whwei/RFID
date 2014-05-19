@@ -6,9 +6,11 @@ comparison.controller('comparisonController', function ($scope, $location, algor
     var algos = algorithmInfoFactory.algos,
         stores = [],
         history,
-        len;
+        len,
+        optList = {};
 
-    for(var i = 0; i < algos.length; i++ ) {
+    // initialize stores
+    for (var i = 0; i < algos.length; i++ ) {
         var v = algos[i];
         history = storageFactory.getItem(v.name + 'Store');
         len = history && history.length;
@@ -17,12 +19,22 @@ comparison.controller('comparisonController', function ($scope, $location, algor
             continue;
         }
 
+        // initialize optList
+        for (var o in history[len - 1].runData.options) {
+            var it = history[len - 1].runData.options[o];
+            if (!optList[o] && it.optional) {
+                optList[o] = it;
+            }
+        }
+
         stores.push({
             name: v.name.toUpperCase(),
             history: history,
             currentRecord: history[len - 1]
         });
     }
+
+    $scope.optList = optList;
 
     $scope.empty = stores.length === 0 ? true : false;
 
@@ -122,8 +134,6 @@ comparison.controller('comparisonController', function ($scope, $location, algor
             });
         });
     });
-
-
 
 
 

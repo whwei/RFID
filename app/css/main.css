@@ -178,6 +178,7 @@ table td {
     height: calc(100% - 24px);
 }
 .slide {
+    overflow: hidden;
     padding-left: 20px;
     height: 100%;
 }
@@ -188,16 +189,19 @@ table td {
 
 
 /*comparison*/
+.comparison-wrapper {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+}
 .comparison {
     padding-bottom: 50px;
 }
-.comparison .records-selector {
-    width: 50%;
-    margin: 0 auto;
+.comparison table {
+    margin: 0 50px;
 }
-.comparison .records-selector caption {
+.comparison caption {
     padding-bottom: 10px;
-    text-align: left;
     font-weight: bold;
 }
 .comparison .chart {
