@@ -54,17 +54,38 @@ GA.prototype = {
         maxCoverage: {
             name: 'maxCoverage',
             desc: '最大化覆盖率',
-            default: true
+            default: true,
+            requirements: {
+                wc: {
+                    name: 'wc',
+                    desc: '覆盖率权重',
+                    value: 1
+                }
+            }
         },
         balance: {
             name: 'balance',
             desc: '负载均衡',
-            default: false
+            default: false,
+            requirements: {
+                wb: {
+                    name: 'wb',
+                    desc: '负载均衡权重',
+                    value: 1
+                }
+            }
         },
         minInterference: {
             name: 'minInterference',
             desc: '最小化干扰',
-            default: false
+            default: false,
+            requirements: {
+                wi: {
+                    name: 'wi',
+                    desc: '干扰权重',
+                    value: 1
+                }
+            }
         },
         minReader: {
             name: 'minReader',
@@ -76,6 +97,11 @@ GA.prototype = {
                     desc: '覆盖率',
                     value: 0.8
                 },
+                minRn: {
+                    name: 'minRn',
+                    desc: '初始读写器数',
+                    value: 5
+                },
                 maxRn: {
                     name: 'maxRn',
                     desc: '最大读写器数',
@@ -85,21 +111,21 @@ GA.prototype = {
         }
     },
     runMode: {
-        maxCoverage: function () {
+        maxCoverage: function (requirements) {
             var i;
             for(i = 0; i < this.options.rpt.value; i++) {
                 this.records[i] = this.records[i] || new Record(null, null, null, cloneReaders(this.initialReaders), cloneReaderArray(this.initialPopulation));
                 this.runOnce(this.records[i]);
             }
         },
-        balance: function () {
+        balance: function (requirements) {
             var i;
             for(i = 0; i < this.options.rpt.value; i++) {
                 this.records[i] = this.records[i] || new Record(null, null, null, cloneReaders(this.initialReaders), cloneReaderArray(this.initialPopulation));
                 this.runOnce(this.records[i]);
             }
         },
-        minInterference: function () {
+        minInterference: function (requirements) {
             var i;
             for(i = 0; i < this.options.rpt.value; i++) {
                 this.records[i] = this.records[i] || new Record(null, null, null, cloneReaders(this.initialReaders), cloneReaderArray(this.initialPopulation));
@@ -110,7 +136,7 @@ GA.prototype = {
             var i,
                 j;
             for (i = 0; i < this.options.rpt.value; i++) {
-                for (j = 1; j < requirements.maxRn.value; j++) {
+                for (j = requirements.minRn.value; j < requirements.maxRn.value; j++) {
                     this.options.rn.value = j;
                     this.records[i] = new Record(
                                             null,
@@ -137,24 +163,28 @@ GA.prototype = {
             name: 'rn',
             desc: '读写器个数',
             optional: true,
+            cate: 'simulation',
             value: 10
         },
         tn: {
             name: 'tn',
             desc: '标签个数',
             optional: true,
+            cate: 'simulation',
             value: 30
         },
         xsize: {
             name: 'xsize',
             desc: '工作区宽度',
             optional: true,
+            cate: 'simulation',
             value: 30
         },
         ysize: {
             name: 'ysize',
             desc: '工作区高度',
             optional: true,
+            cate: 'simulation',
             value: 30
         },
 //        r: {
@@ -167,72 +197,84 @@ GA.prototype = {
             name: 'Gtx',
             desc: '天线增益',
             optional: true,
+            cate: 'simulation',
             value: 1.5
         },
         Gtag: {
             name: 'Gtag',
             desc: '标签增益',
             optional: true,
+            cate: 'simulation',
             value: 1.5
         },
         Rq: {
             name: 'Rq',
             desc: '门限值',
             optional: true,
+            cate: 'simulation',
             value: -10
         },
         Ps: {
             name: 'Ps',
             desc: '读写器输出功率',
             optional: true,
+            cate: 'simulation',
             value: 30
         },
         iterations: {
             name: 'iterations',
             desc: '最大代数',
             optional: true,
+            cate: 'simulation',
             value: 50
         },
         m: {
             name: 'm',
             desc: '种群大小',
             optional: true,
+            cate: 'algorithm',
             value: 30
         },
         pc: {
             name: 'pc',
             desc: '交叉概率',
             optional: true,
+            cate: 'algorithm',
             value: 0.7
         },
         pm: {
             name: 'pm',
             desc: '突变概率',
             optional: true,
+            cate: 'algorithm',
             value: 0.05
         },
         wc: {
             name: 'wc',
             desc: '覆盖率权重',
-            optional: true,
+            optional: false,
+            cate: 'simulation',
             value: 0.9
         },
         wi: {
             name: 'wi',
             desc: '干扰率权重',
-            optional: true,
+            optional: false,
+            cate: 'simulation',
             value: 0.05
         },
         wb: {
             name: 'wb',
             desc: '负载均衡权重',
-            optional: true,
+            optional: false,
+            cate: 'simulation',
             value: 0.05
         },
         rpt: {
             name: 'rpt',
             desc: '运行次数',
             optional: true,
+            cate: 'simulation',
             value: 5
         }
     },

@@ -3,7 +3,7 @@
 angular.module('window', []);
 angular.module('addAlgorithm', []);
 angular.module('algorithm', []);
-angular.module('comparison', []);
+angular.module('comparison', ['algorithm']);
 angular.module('commonFactory', []);
 angular.module('nav', []);
 

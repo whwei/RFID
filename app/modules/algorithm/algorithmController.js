@@ -167,7 +167,8 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
         $scope.result = result;
 
         initTimeChart('#highest',
-            'Fitness 收敛图' + (result.runData.bestPos !== 0 ? '（第' + (result.runData.bestPos + 1) + '次模拟）' : ''),
+            'Fitness 收敛图',
+            (result.runData.bestPos !== 0 ? '第' + (result.runData.bestPos + 1) + '次模拟' : ''),
             result.records[result.runData.bestPos].highest
         );
         initBubbleChart('#bubble-chart-origin',
@@ -197,6 +198,7 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
             initResult(value);
         }
     });
+
 
     function initBubbleChart(selector, title, tags, readers) {
         $(selector).highcharts({
@@ -243,7 +245,7 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
         });
     }
 
-    function initTimeChart(selector, title, data) {
+    function initTimeChart(selector, title, subtitle, data) {
         $(selector).highcharts({
             chart: {
                 zoomType: 'x'
@@ -253,6 +255,9 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
             },
             title: {
                 text: title
+            },
+            subtitle: {
+                text: subtitle
             },
             xAxis: {
                 type: 'linear',

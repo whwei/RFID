@@ -12,7 +12,7 @@
             <div class="col-container">
                 <div ng-repeat="mode in modes">
                     <label for="{{ mode.name }}">
-                        <input type="radio" id="{{ mode.name }}" ng-checked="mode.default" name="runMode" ng-model="$parent.runMode" value="{{ mode.name }}">
+                        <input type="checkbox" id="{{ mode.name }}" ng-checked="mode.default" ng-model="$parent.runMode" value="{{ mode.name }}">
                         {{ mode.desc }}
                     </label>
                     <div class="rq">
@@ -27,7 +27,16 @@
         <div class="param-setting">
             <h3>模拟参数</h3>
             <div class="col-container">
-                <div class="options" ng-repeat="option in options">
+                <div class="options" ng-repeat="option in options | simulationParam">
+                    <label for="{{option.name}}">{{option.desc}}</label>
+                    <input ng-disabled="option.disabled" type="text" id="{{option.name}}" ng-model="option.value" />
+                </div>
+            </div>
+        </div>
+        <div class="param-setting">
+            <h3>算法参数</h3>
+            <div class="col-container">
+                <div class="options" ng-repeat="option in options| algorithmParam">
                     <label for="{{option.name}}">{{option.desc}}</label>
                     <input ng-disabled="option.disabled" type="text" id="{{option.name}}" ng-model="option.value" />
                 </div>
@@ -49,7 +58,7 @@
     <div class="statistic animate-switch" ng-class="panels.result">
         <div class="no-result" ng-show="cleanHistory">暂无数据</div>
         <div class="history-selector" ng-hide="cleanHistory">
-            历史记录：<select ng-model="currentRecord" ng-options="record.runData.date | date: 'yyyy/M/d H:m:s' for record in history"></select>
+            历史记录：<select ng-model="currentRecord" ng-options="record.runData.date | date: 'yy/M/d H:m:s' + ' (最高适应度:' + record.runData.readerStatistic.fitness.toFixed(3) + ')' for record in history"></select>
         </div>
         <div class="result" ng-hide="cleanHistory">
             <div class="best-solution">
@@ -64,7 +73,7 @@
                         <div class="table-container">
                             <table>
                                 <tr><th>指标</th><th>数值</th></tr>
-                                <tr><td>模拟日期</td><td>{{ result.runData.date | date : 'yyyy/M/d H:m:s' }}</td></tr>
+                                <tr><td>模拟日期</td><td>{{ result.runData.date | date : 'yy/M/d H:m:s' }}</td></tr>
                                 <tr><td>运行次数</td><td>{{ result.runData.options.rpt.value }}</td></tr>
                                 <tr><td>平均读写器个数</td><td>{{ result.runData.avgRn | number }}</td></tr>
                                 <tr><td>平均运行时间（ms）</td><td>{{ result.runData.avgTime | number }}</td></tr>

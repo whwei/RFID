@@ -146,7 +146,7 @@ table td {
 .nav-main .list-group-title {
     margin: 15px 0 5px;
     font-size: 14px;
-    color: #333;
+    color: #ccc;
 }
 
 .nav-main .list-group-title:first-of-type {
@@ -179,7 +179,7 @@ table td {
 }
 .slide {
     overflow: hidden;
-    padding-left: 20px;
+    margin-left: 20px;
     height: 100%;
 }
 .no-result {
@@ -267,17 +267,20 @@ table td {
     margin: 5px 0px 5px 10px;
 }
 .goal-setting .rq {
-    margin-left: 50px;
+    padding-left: 20px;
 }
 .rq span {
     display: inline-block;
     width: 50%;
 }
 .rq label {
-    width: 8em;
+    display: inline-block;
+    margin-right: 10px;
+    width: 7em;
     text-align: right;
 }
 .rq input {
+    margin-left: 10px;
     padding: 5px;
     border: 1px solid rgba(200, 200, 200, .5);
     width: 120px;
@@ -289,6 +292,7 @@ table td {
     border: 1px solid rgba(80, 150, 225, .5);
 }
 .param-setting .col-container {
+    margin-bottom: 50px;
     -webkit-columns: 20em;
 }
 .options {
@@ -302,7 +306,7 @@ table td {
     text-align: right;
 }
 .options input {
-    margin-left: 20px;
+    margin-left: 10px;
     padding: 5px;
     border: 1px solid rgba(200, 200, 200, .5);
     min-width: 180px;

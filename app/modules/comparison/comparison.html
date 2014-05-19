@@ -7,9 +7,17 @@
                 <tr><th>参数</th><th ng-repeat="store in stores">{{store.name}}</th></tr>
                 <tr class="">
                     <td class="">选择记录</td>
-                    <td ng-repeat="store in stores"><select ng-model="store.currentRecord" ng-options="record.runData.date | date: 'yyyy/M/d H:m:s' for record in store.history"></select></td>
+                    <td ng-repeat="store in stores">
+                        <select ng-model="store.currentRecord"
+                                ng-options="record.runData.date | date: 'yy/M/d H:m:s' + ' (最高适应度:' + record.runData.readerStatistic.fitness.toFixed(3) + ')' for record in store.history">
+                        </select>
+                    </td>
                 </tr>
-                <tr class="" ng-repeat="opt in optList">
+                <tr class="" ng-repeat="opt in optList | simulationParam">
+                    <td class="">{{ opt.desc }}</td>
+                    <td ng-repeat="store in stores">{{store.currentRecord.runData.options[opt.name].value}}</td>
+                </tr>
+                <tr class="" ng-repeat="opt in optList | algorithmParam">
                     <td class="">{{ opt.desc }}</td>
                     <td ng-repeat="store in stores">{{store.currentRecord.runData.options[opt.name].value}}</td>
                 </tr>
@@ -17,6 +25,7 @@
 
             <!--<div id="column-drilldown-chart" style="min-width: 310px; height: 400px; margin: 0 auto"></div>-->
             <!--<pre id="cd-tsv" style="display:none"></pre>-->
+            <div id="column-chart-highest" class="chart"></div>
             <div id="column-chart-avgFitness" class="chart"></div>
             <div id="column-chart-avgTime" class="chart"></div>
             <div id="column-chart-avgIte" class="chart"></div>

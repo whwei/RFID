@@ -157,108 +157,126 @@ PSO.prototype = {
             name: 'rn',
             desc: '读写器个数',
             optional: true,
+            cate: 'simulation',
             value: 10
         },
         tn: {
             name: 'tn',
             desc: '标签个数',
             optional: true,
+            cate: 'simulation',
             value: 30
         },
         xsize: {
             name: 'xsize',
             desc: '工作区宽度',
             optional: true,
+            cate: 'simulation',
             value: 30
         },
         ysize: {
             name: 'ysize',
             desc: '工作区高度',
             optional: true,
+            cate: 'simulation',
             value: 30
         },
         Gtx: {
             name: 'Gtx',
             desc: '天线增益',
             optional: true,
+            cate: 'simulation',
             value: 1.5
         },
         Gtag: {
             name: 'Gtag',
             desc: '标签增益',
             optional: true,
+            cate: 'simulation',
             value: 1.5
         },
         Rq: {
             name: 'Rq',
             desc: '门限值',
             optional: true,
+            cate: 'simulation',
             value: -10
         },
         Ps: {
             name: 'Ps',
             desc: '读写器输出功率',
             optional: true,
+            cate: 'simulation',
             value: 30
         },
         iterations: {
             name: 'iterations',
             desc: '最大代数',
             optional: true,
+            cate: 'simulation',
             value: 50
         },
         m: {
             name: 'm',
             desc: '种群大小',
             optional: true,
+            cate: 'algorithm',
             value: 30
         },
         c1: {
             name: 'c1',
             desc: '学习因子c1',
             optional: true,
+            cate: 'algorithm',
             value: 2
         },
         c2: {
             name: 'c2',
             desc: '学习因子c2',
             optional: true,
+            cate: 'algorithm',
             value: 2
         },
         w: {
             name: 'w',
             desc: '惯性权重',
             optional: true,
+            cate: 'algorithm',
             value: 0.75
         },
         maxV: {
             name: 'maxV',
             desc: '最大速度',
             optional: true,
+            cate: 'algorithm',
             value: 0.1
         },
         wc: {
             name: 'wc',
             desc: '覆盖率权重',
-            optional: true,
+            optional: false,
+            cate: 'simulation',
             value: 0.9
         },
         wi: {
             name: 'wi',
             desc: '干扰率权重',
-            optional: true,
+            optional: false,
+            cate: 'simulation',
             value: 0.05
         },
         wb: {
             name: 'wb',
             desc: '负载均衡权重',
-            optional: true,
+            optional: false,
+            cate: 'simulation',
             value: 0.05
         },
         rpt: {
             name: 'rpt',
             desc: '运行次数',
             optional: true,
+            cate: 'simulation',
             value: 5
         }
     },

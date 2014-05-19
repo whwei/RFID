@@ -45,13 +45,41 @@ comparison.controller('comparisonController', function ($scope, $location, algor
         $scope.$watch(function(){
             return $scope.stores[i].currentRecord;
         }, function(value) {
+            initColumnChart('#column-chart-highest', {
+                title: {
+                    text: '最高适应度'
+                },
+                subtitle: {
+                    text: '数值越高越好'
+                },
+                xAxis: {
+                    categories: [
+                        ''
+                    ]
+                },
+                yAxis: {
+                    title: {
+                        text: '适应度'
+                    }
+                },
+                series: stores.map(function(v){
+                    return {
+                        name: v.name,
+                        data: [v.currentRecord.runData.readerStatistic.fitness]
+                    };
+                })
+            });
+
             initColumnChart('#column-chart-avgFitness', {
                 title: {
                     text: '平均适应度'
                 },
+                subtitle: {
+                    text: '数值越高越好'
+                },
                 xAxis: {
                     categories: [
-                        '平均适应度'
+                        ''
                     ]
                 },
                 yAxis: {
@@ -71,14 +99,17 @@ comparison.controller('comparisonController', function ($scope, $location, algor
                 title: {
                     text: '平均模拟时间'
                 },
+                subtitle: {
+                    text: '数值越小越好'
+                },
                 xAxis: {
                     categories: [
-                        '平均模拟时间'
+                        ''
                     ]
                 },
                 yAxis: {
                     title: {
-                        text: '时间'
+                        text: '时间（ms）'
                     }
                 },
                 series: stores.map(function(v){
@@ -92,6 +123,9 @@ comparison.controller('comparisonController', function ($scope, $location, algor
             initColumnChart('#column-chart-avgIte', {
                 title: {
                     text: '得到最佳适应度平均代数'
+                },
+                subtitle: {
+                    text: '数值越小越好'
                 },
                 xAxis: {
                     categories: [
@@ -114,6 +148,9 @@ comparison.controller('comparisonController', function ($scope, $location, algor
             initColumnChart('#column-chart-mse', {
                 title: {
                     text: '模拟均方差'
+                },
+                subtitle: {
+                    text: '数值越小越好'
                 },
                 xAxis: {
                     categories: [
