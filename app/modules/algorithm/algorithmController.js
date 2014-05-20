@@ -10,6 +10,7 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
     $scope.optionLoaded = false;
     $scope.calculating = '';
     $scope.runMode = '';
+    $scope.weightCheck = true;
     $scope.history = storageFactory.getItem(storeName);
 
     // tab setting
@@ -32,7 +33,7 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
         // bind worker event
         wk.addEventListener('message', function (e) {
             if (e.data.type === 'result'){
-                console.log(e.data.value);
+
                 $scope.$apply(function(scope) {
                     $scope.cleanHistory = false;
                     scope.result = e.data.value;
@@ -84,11 +85,11 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
             } else if (e.data.type === 'mode') {
                 $scope.$apply(function(scope) {
                     scope.modes = JSON.parse(e.data.value);
-                    for (var p in scope.modes) {
-                        if (scope.modes[p].default) {
-                            scope.runMode = p;
-                        }
-                    }
+                    scope.runMode = 'normal';
+                    scope.requirements = {};
+                    scope.requirements.minReader = scope.modes['minReader'].requirements;
+                    scope.requirements.weight = scope.modes['normal'].requirements;
+
                 });
             } else if (e.data.type === 'statistic') {
                 $scope.$apply(function(scope) {
@@ -138,20 +139,40 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
 
 
     $scope.simulate = function () {
-        $scope.calculating = 'calculating-show';
+        if ($scope.options && $scope.weightCheck){
+            $scope.calculating = 'calculating-show';
 
-        if ($scope.options){
             // run worker
             wk.postMessage({
                 command: 'run',
                 options: $scope.options,
                 mode: {
                     name: $scope.runMode,
-                    requirements: $scope.modes[$scope.runMode].requirements
+                    requirements: $scope.requirements
                 }
             });
         }
     };
+
+    $scope.$watch('requirements.weight.wc.value', checkWeight);
+    $scope.$watch('requirements.weight.wb.value', checkWeight);
+    $scope.$watch('requirements.weight.wi.value', checkWeight);
+
+    function checkWeight(value) {
+        if (!$scope.requirements) {
+            return;
+        }
+
+        var total = $scope.requirements.weight.wc.value +
+                    $scope.requirements.weight.wb.value +
+                    $scope.requirements.weight.wi.value;
+
+        if (total !== 1) {
+            $scope.weightCheck = false;
+        } else {
+            $scope.weightCheck = true;
+        }
+    }
 
     function initResult(target) {
         var result = {};

@@ -1,3 +1,5 @@
+
+
 .slide.ng-enter {
 	transition: all .3s ease-out;
 }
@@ -12,5 +14,3 @@
 	-webkit-transform: translate3d(0, 0, 0);
 	opacity: 1;
 }
-
-

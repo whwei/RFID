@@ -8,7 +8,6 @@ wd.controller('windowController', function ($scope, windowFactory) {
     };
 
     $scope.hideWindow = function () {
-        console.log('minimize');
         windowFactory.minimize();
     } ;
 

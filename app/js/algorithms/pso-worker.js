@@ -53,20 +53,30 @@ var PSO = function (op) {
 
 PSO.prototype = {
     mode: {
-        maxCoverage: {
-            name: 'maxCoverage',
-            desc: '最大化覆盖率',
-            default: true
-        },
-        balance: {
-            name: 'balance',
-            desc: '负载均衡',
-            default: false
-        },
-        minInterference: {
-            name: 'minInterference',
-            desc: '最小化干扰',
-            default: false
+        normal: {
+            name: 'normal',
+            desc: '最大化适应度',
+            default: true,
+            requirements: {
+                wc: {
+                    name: 'wc',
+                    desc: '覆盖率权重',
+                    cate: 'simulation',
+                    value: 0.9
+                },
+                wi: {
+                    name: 'wi',
+                    desc: '干扰率权重',
+                    cate: 'simulation',
+                    value: 0.05
+                },
+                wb: {
+                    name: 'wb',
+                    desc: '负载均衡权重',
+                    cate: 'simulation',
+                    value: 0.05
+                }
+            }
         },
         minReader: {
             name: 'minReader',
@@ -78,6 +88,11 @@ PSO.prototype = {
                     desc: '覆盖率',
                     value: 0.8
                 },
+                minRn: {
+                    name: 'minRn',
+                    desc: '初始读写器数',
+                    value: 5
+                },
                 maxRn: {
                     name: 'maxRn',
                     desc: '最大读写器数',
@@ -87,34 +102,10 @@ PSO.prototype = {
         }
     },
     runMode: {
-        maxCoverage: function () {
+        normal: function (requirements) {
             var i;
-            for(i = 0; i < this.options.rpt.value; i++) {
-                this.records[i] = this.records[i] || new Record(
-                                                            null,
-                                                            null,
-                                                            null,
-                                                            cloneReaders(this.initialReaders),
-                                                            cloneReaderArray(this.initialPopulation),
-                                                            cloneArray(this.initialV));
-                this.runOnce(this.records[i]);
-            }
-        },
-        balance: function () {
-            var i;
-            for(i = 0; i < this.options.rpt.value; i++) {
-                this.records[i] = this.records[i] || new Record(
-                                                            null,
-                                                            null,
-                                                            null,
-                                                            cloneReaders(this.initialReaders),
-                                                            cloneReaderArray(this.initialPopulation),
-                                                            cloneArray(this.initialV));
-                this.runOnce(this.records[i]);
-            }
-        },
-        minInterference: function () {
-            var i;
+
+            this.options = extend(this.options, requirements.weight);
             for(i = 0; i < this.options.rpt.value; i++) {
                 this.records[i] = this.records[i] || new Record(
                                                             null,
@@ -129,8 +120,10 @@ PSO.prototype = {
         minReader: function (requirements) {
             var i,
                 j;
+
+            this.options = extend(this.options, requirements.weight);
             for (i = 0; i < this.options.rpt.value; i++) {
-                for (j = 1; j < requirements.maxRn.value; j++) {
+                for (j = 1; j < requirements.minReader.maxRn.value; j++) {
                     this.options.rn.value = j;
                     this.records[i] = new Record(
                                             null,
@@ -140,10 +133,10 @@ PSO.prototype = {
                                             cloneReaderArray(this.initPopulation(j)),
                                             cloneArray(this.initialV));
                     this.runOnce(this.records[i], function (record) {
-                        return record.readers.statistic.results[0].value >= requirements.coverage.value;
+                        return record.readers.statistic.results[0].value >= requirements.minReader.coverage.value;
                     });
 
-                    if (this.records[i].readers.statistic.results[0].value >= requirements.coverage.value) {
+                    if (this.records[i].readers.statistic.results[0].value >= requirements.minReader.coverage.value) {
                         break;
                     }
                 }
@@ -381,6 +374,7 @@ PSO.prototype = {
 
         this.runData.mode = {
             mode: mode,
+            desc: this.mode[mode].desc,
             requirements: requirements
         };
 

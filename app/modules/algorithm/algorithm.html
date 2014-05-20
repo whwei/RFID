@@ -10,15 +10,70 @@
         <div class="goal-setting">
             <h3>优化目标</h3>
             <div class="col-container">
-                <div ng-repeat="mode in modes">
-                    <label for="{{ mode.name }}">
-                        <input type="checkbox" id="{{ mode.name }}" ng-checked="mode.default" ng-model="$parent.runMode" value="{{ mode.name }}">
-                        {{ mode.desc }}
+                <div class="normal">
+
+                    <!--wc-->
+                    <label for="wc">
+                        <input type="checkbox" id="wc"
+                               ng-checked="wcCheck" ng-model="wcCheck" ng-init="wcCheck = true">
+                        覆盖率优先
                     </label>
                     <div class="rq">
-                        <span ng-repeat="rq in mode.requirements">
+                        <span>
+                            <rfid-weight weight-disabled="!wcCheck"
+                                         weight-id="{{ requirements.weight.wc.name }}"
+                                         weight-name="{{ requirements.weight.wc.desc }}"
+                                         weight-value="requirements.weight.wc.value">
+                            </rfid-weight>
+                        </span>
+                    </div>
+                    <!--wb-->
+                    <label for="wb">
+                        <input type="checkbox" id="wb"
+                               ng-checked="wbCheck" ng-model="wbCheck" ng-init="wbCheck = true">
+                        负载均衡优先
+                    </label>
+                    <div class="rq">
+                        <span>
+                            <rfid-weight weight-disabled="!wbCheck"
+                                         weight-id="{{ requirements.weight.wb.name }}"
+                                         weight-name="{{ requirements.weight.wb.desc }}"
+                                         weight-value="requirements.weight.wb.value">
+                            </rfid-weight>
+                        </span>
+                    </div>
+                    <!--wi-->
+                    <label for="wi">
+                        <input type="checkbox" id="wi"
+                               ng-checked="wiCheck" ng-model="wiCheck" ng-init="wiCheck = true">
+                        干扰率优先
+                    </label>
+                    <div class="rq">
+                        <span>
+                            <rfid-weight weight-disabled="!wiCheck"
+                                         weight-id="{{ requirements.weight.wi.name }}"
+                                         weight-name="{{ requirements.weight.wi.desc }}"
+                                         weight-value="requirements.weight.wi.value">
+                            </rfid-weight>
+                        </span>
+                    </div>
+
+                    <!--total weight !== 1-->
+                    <div class="invalid" ng-class="{show: !weightCheck}">
+                        <p>权重之和应该等于 1</p>
+                    </div>
+                </div>
+                <div class="min-reader">
+                    <label for="{{ modes.minReader.name }}">
+                        <input type="checkbox" id="{{ modes.minReader.name }}"
+                               ng-checked="{{ requirements.minReader.default }}"
+                               ng-model="runMode" ng-true-value="minReader" ng-false-value="normal">
+                        {{ modes.minReader.desc }}
+                    </label>
+                    <div class="rq">
+                        <span ng-repeat="rq in requirements.minReader">
                             <label for="{{ rq.name }}">{{ rq.desc }}</label>
-                            <input type="text" id="{{ rq.name }}" ng-model="rq.value" />
+                            <input type="text" ng-disabled="runMode==='normal'" id="{{ rq.name }}" ng-model="rq.value" />
                         </span>
                     </div>
                 </div>
@@ -75,6 +130,7 @@
                                 <tr><th>指标</th><th>数值</th></tr>
                                 <tr><td>模拟日期</td><td>{{ result.runData.date | date : 'yy/M/d H:m:s' }}</td></tr>
                                 <tr><td>运行次数</td><td>{{ result.runData.options.rpt.value }}</td></tr>
+                                <tr><td>优化目标</td><td>{{ result.runData.mode.desc }}</td></tr>
                                 <tr><td>平均读写器个数</td><td>{{ result.runData.avgRn | number }}</td></tr>
                                 <tr><td>平均运行时间（ms）</td><td>{{ result.runData.avgTime | number }}</td></tr>
                                 <tr><td>平均适应度</td><td>{{ result.runData.avgFitness | number }}</td></tr>

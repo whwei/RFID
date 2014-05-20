@@ -51,39 +51,28 @@ var GA = function (op) {
 
 GA.prototype = {
     mode: {
-        maxCoverage: {
-            name: 'maxCoverage',
-            desc: '最大化覆盖率',
+        normal: {
+            name: 'normal',
+            desc: '最大化适应度',
             default: true,
             requirements: {
                 wc: {
                     name: 'wc',
                     desc: '覆盖率权重',
-                    value: 1
-                }
-            }
-        },
-        balance: {
-            name: 'balance',
-            desc: '负载均衡',
-            default: false,
-            requirements: {
+                    cate: 'simulation',
+                    value: 0.9
+                },
+                wi: {
+                    name: 'wi',
+                    desc: '干扰率权重',
+                    cate: 'simulation',
+                    value: 0.05
+                },
                 wb: {
                     name: 'wb',
                     desc: '负载均衡权重',
-                    value: 1
-                }
-            }
-        },
-        minInterference: {
-            name: 'minInterference',
-            desc: '最小化干扰',
-            default: false,
-            requirements: {
-                wi: {
-                    name: 'wi',
-                    desc: '干扰权重',
-                    value: 1
+                    cate: 'simulation',
+                    value: 0.05
                 }
             }
         },
@@ -111,22 +100,10 @@ GA.prototype = {
         }
     },
     runMode: {
-        maxCoverage: function (requirements) {
+        normal: function (requirements) {
             var i;
-            for(i = 0; i < this.options.rpt.value; i++) {
-                this.records[i] = this.records[i] || new Record(null, null, null, cloneReaders(this.initialReaders), cloneReaderArray(this.initialPopulation));
-                this.runOnce(this.records[i]);
-            }
-        },
-        balance: function (requirements) {
-            var i;
-            for(i = 0; i < this.options.rpt.value; i++) {
-                this.records[i] = this.records[i] || new Record(null, null, null, cloneReaders(this.initialReaders), cloneReaderArray(this.initialPopulation));
-                this.runOnce(this.records[i]);
-            }
-        },
-        minInterference: function (requirements) {
-            var i;
+
+            this.options = extend(this.options, requirements.weight);
             for(i = 0; i < this.options.rpt.value; i++) {
                 this.records[i] = this.records[i] || new Record(null, null, null, cloneReaders(this.initialReaders), cloneReaderArray(this.initialPopulation));
                 this.runOnce(this.records[i]);
@@ -135,8 +112,10 @@ GA.prototype = {
         minReader: function (requirements) {
             var i,
                 j;
+
+            this.options = extend(this.options, requirements.weight);
             for (i = 0; i < this.options.rpt.value; i++) {
-                for (j = requirements.minRn.value; j < requirements.maxRn.value; j++) {
+                for (j = requirements.minReader.minRn.value; j < requirements.minReader.maxRn.value; j++) {
                     this.options.rn.value = j;
                     this.records[i] = new Record(
                                             null,
@@ -146,10 +125,10 @@ GA.prototype = {
                                             cloneReaderArray(this.initPopulation(j))
                                         );
                     this.runOnce(this.records[i], function (record) {
-                        return record.readers.statistic.results[0].value >= requirements.coverage.value;
+                        return record.readers.statistic.results[0].value >= requirements.minReader.coverage.value;
                     });
 
-                    if (this.records[i].readers.statistic.results[0].value >= requirements.coverage.value) {
+                    if (this.records[i].readers.statistic.results[0].value >= requirements.minReader.coverage.value) {
                         break;
                     }
                 }
@@ -354,12 +333,13 @@ GA.prototype = {
         this.status.repetition = 0;
     },
     run: function(mode, requirements) {
-        this.runMode[mode || 'maxCoverage'].call(this, requirements);
+        this.runMode[mode || 'normal'].call(this, requirements);
 
         this.simulationStatistic();
 
         this.runData.mode = {
             mode: mode,
+            desc: this.mode[mode].desc,
             requirements: requirements
         };
 

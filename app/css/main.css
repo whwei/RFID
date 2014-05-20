@@ -59,6 +59,26 @@ table td {
     text-overflow: ellipsis;
 }
 
+input:disabled {
+    background: #efefef;
+}
+.invalid {
+    display: none;
+}
+.invalid p {
+    margin: 5px 10px;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid rgb(180, 180, 180);
+    background-color: rgb(200, 200, 200);
+    color: white;
+    text-shadow: 1px 1px 1px rgba(0,0,0,.5);
+    text-align: center;
+}
+.panels .invalid.show {
+    display: block;
+}
+
 .btn-primary {
     padding: 5px 25px;
     border-radius: 3px;
@@ -328,7 +348,7 @@ table td {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
+    position: fixed;
     left: 0; top: 0;
     height: 100%;
     width: 100%;
