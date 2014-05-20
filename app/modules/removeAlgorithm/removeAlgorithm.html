@@ -1,0 +1,9 @@
+<div class="remove-wrapper">
+    <h3>移除算法</h3>
+    <ol class="remove-list">
+        <li ng-repeat="algo in list">
+            <h4>{{ algo.title }}</h4>
+            <button class="btn-primary" ng-click="remove(algo.name)">Remove</button>
+        </li>
+    </ol>
+</div>

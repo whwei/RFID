@@ -11,7 +11,9 @@ nav.controller('navController', function ($scope, $location, algorithmInfoFactor
 
     $scope.addAlgo = { url: '#/add', name: 'add', title: '添加算法', klass: '' };
 
-    $scope.navList = [$scope.compareAlgo].concat($scope.algos.concat([$scope.addAlgo]));
+    $scope.removeAlgo = { url: '#/remove', name: 'remove', title: '移除算法', klass: '' };
+
+    $scope.navList = concatItems($scope.compareAlgo, $scope.algos, $scope.addAlgo, $scope.removeAlgo);
 
     $scope.select = function (url) {
         $scope.navList.forEach(function (v, k) {
@@ -23,8 +25,28 @@ nav.controller('navController', function ($scope, $location, algorithmInfoFactor
 
     $scope.$on('navRefresh', function () {
         $scope.algos = algorithmInfoFactory.refresh();
-        $scope.navList = $scope.algos.concat([$scope.addAlgo]);
+        $scope.navList = concatItems($scope.compareAlgo, $scope.algos, $scope.addAlgo, $scope.removeAlgo);
         $scope.select('#' + $location.$$path);
     });
+
+    function concatItems() {
+        var i,
+            it,
+            type,
+            ret = [],
+            args = [].slice.call(arguments);
+
+        for (i = 0; i < args.length; i++) {
+            it = args[i];
+            type = Object.prototype.toString.call(args[i]);
+            if (type === '[object Array]' ) {
+                ret = ret.concat(it);
+            } else if (type === '[object Object]') {
+                ret.push(it);
+            }
+        }
+
+        return ret;
+    }
 });
 

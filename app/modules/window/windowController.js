@@ -10,10 +10,6 @@ wd.controller('windowController', function ($scope, windowFactory) {
     $scope.hideWindow = function () {
         windowFactory.minimize();
     } ;
-
-    $scope.$on('algoSaved', function (e) {
-        $scope.$broadcast('navRefresh');
-    });
 });
 
 

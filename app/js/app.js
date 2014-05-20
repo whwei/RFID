@@ -1,7 +1,8 @@
 "use strict";
 
 angular.module('window', []);
-angular.module('addAlgorithm', []);
+angular.module('addAlgorithm', ['commonFactory', 'algorithm']);
+angular.module('removeAlgorithm', ['commonFactory', 'algorithm']);
 angular.module('algorithm', []);
 angular.module('comparison', ['algorithm']);
 angular.module('commonFactory', []);
@@ -19,6 +20,14 @@ var app = angular.module('app',
         'nav'
     ]);
 
+app.controller('appController', function($scope) {
+    $scope.$on('algoSaved', function (e) {
+        $scope.$broadcast('navRefresh');
+    });
+    $scope.$on('algoRemoved', function (e) {
+        $scope.$broadcast('navRefresh');
+    });
+});
 
 app.config(['$routeProvider', function($routeProvider){
     $routeProvider
@@ -34,6 +43,10 @@ app.config(['$routeProvider', function($routeProvider){
 			controller: 'comparisonController',
 			templateUrl: 'modules/comparison/comparison.html'
 		})
+        .when('/remove', {
+            controller: 'removeController',
+            templateUrl: 'modules/removeAlgorithm/removeAlgorithm.html'
+        })
 		.otherwise({ redirectTo: '/comparison'});
 }]);
 

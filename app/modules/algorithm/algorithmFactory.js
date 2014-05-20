@@ -8,7 +8,8 @@ algorithm.factory('algorithmFactory', function () {
 
     var algorithmInfo = require('./js/node/algorithmInfo').algorithmInfo;
 
-    af.algos = algorithmInfo.loadAlgorithmInfo();
+    af = algorithmInfo;
+    af.algos = algorithmInfo.loadAlgorithmInfo().slice();
     af.algos.map(function (a, i) {
         a.url = '#/algorithms/' + a.name;
         a.klass = i === 0 ? 'current' : '';

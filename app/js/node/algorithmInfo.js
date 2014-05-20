@@ -17,7 +17,20 @@ var algorithmInfo = {
     },
     saveAlgorithmInfo: function (info) {
         this.refresh();
-        this.algorithmInfos.push(info);
+        info && this.algorithmInfos.push(info);
+        fs.writeFileSync(this.aiPath, JSON.stringify(this.algorithmInfos, null, '\t'));
+    },
+    removeAlgorithmInfo: function (name) {
+        this.refresh();
+        var i = 0;
+        for (; i< this.algorithmInfos.length; i++) {
+            if (this.algorithmInfos[i].name === name) {
+                break;
+            }
+        }
+        
+        this.algorithmInfos.splice(i, 1);
+        console.log(this.algorithmInfos);
         fs.writeFileSync(this.aiPath, JSON.stringify(this.algorithmInfos, null, '\t'));
     }
 };

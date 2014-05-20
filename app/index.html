@@ -13,7 +13,7 @@
         <script src="bower_components/angular-route/angular-route.min.js"></script>
         <script src="bower_components/angular-animate/angular-animate.min.js"></script>
     </head>
-    <body>
+    <body ng-controller="appController">
         <div class="toolbar" ng-controller="windowController">
             <button class="close" ng-click="closeWindow()"><span>&times;</span></button>
             <button class="min" ng-click="hideWindow()"><span>_</span></button>
@@ -35,6 +35,9 @@
                     <li>
                         <a href="{{ addAlgo.url }}" class="list-group-item" ng-click="select(addAlgo.url)" ng-class="addAlgo.klass">{{ addAlgo.title }}</a>
                     </li>
+                    <li>
+                        <a href="{{ removeAlgo.url }}" class="list-group-item" ng-click="select(removeAlgo.url)" ng-class="removeAlgo.klass">{{ removeAlgo.title }}</a>
+                    </li>
                 </ul>
             </div>
             <div class="main-content">
@@ -54,6 +57,7 @@
         <script src="modules/algorithm/algorithmFilter.js"></script>
         <script src="modules/algorithm/algorithmDirective.js"></script>
         <script src="modules/addAlgorithm/addController.js"></script>
+        <script src="modules/removeAlgorithm/removeAlgorithm.js"></script>
         <script src="modules/factory/saverFactory.js"></script>
         <script src="modules/factory/storageFactory.js"></script>
     </body>

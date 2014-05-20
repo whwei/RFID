@@ -505,7 +505,7 @@ GA.prototype = {
 
         return this;
     },
-    // received power of tag from reader
+    // propagation model
     getPower: function (reader, tag, it) {
         var d = 0;
         if (it >= 0) {

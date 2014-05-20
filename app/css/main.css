@@ -90,6 +90,7 @@ input:disabled {
     outline: none;
     transition: all .218s ease;
 }
+
 .btn-primary:hover {
     background-color: rgb(60, 150, 225);
     color: white;
@@ -97,6 +98,9 @@ input:disabled {
 .btn-primary:active {
     background-color: rgb(10, 110, 200);
     color: white;
+}
+.btn-simulate {
+    padding: 10px 40px;
 }
 
 /*icon*/
@@ -217,8 +221,12 @@ input:disabled {
 .comparison {
     padding-bottom: 50px;
 }
+.comparison .records-param {
+    overflow-x: auto;
+    width: 100%;
+}
 .comparison table {
-    margin: 0 50px;
+    margin: 0 30px;
 }
 .comparison caption {
     padding-bottom: 10px;
@@ -349,9 +357,7 @@ input:disabled {
     justify-content: center;
     align-items: center;
     position: fixed;
-    left: 0; top: 0;
-    height: 100%;
-    width: 100%;
+    left: 0; top: 0; right: 0; bottom: 0;
     background: rgba(255, 255, 255, .75);
     opacity: 0;
     text-align: center;
@@ -445,4 +451,27 @@ input:disabled {
     font-size: 24px;
     font-weight: bold;
     color: #dddddd;
+}
+
+
+/*remove algorith*/
+.remove-wrapper {
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+}
+.remove-list {
+    padding: 0 80px;
+}
+.remove-list li {
+    position: relative;
+    padding: 20px;
+}
+.remove-list button {
+    position: absolute;
+    top: 50%;right: 50px;
+    -webkit-transform: translateY(-50%);
+}
+.remove-list h4 {
+    display: inline-block;
 }
