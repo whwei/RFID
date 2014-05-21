@@ -7,6 +7,10 @@ commonFactory.factory('saverFactory', function () {
 
     sv.saver = require('./js/node/saver').saver;
 
+    var gui = require('nw.gui');
+
+    sv.saver.setPath(gui.App.dataPath);
+
     return sv;
 });
 

@@ -2,7 +2,7 @@
 
 var algorithm = angular.module('algorithm');
 
-algorithm.controller('algorithmController', function ($scope, $routeParams, $location, storageFactory) {
+algorithm.controller('algorithmController', function ($scope, $routeParams, $location, storageFactory, saverFactory) {
     var storeName = $routeParams.algo + 'Store';
 
     $scope.algo = $routeParams.algo;
@@ -17,9 +17,12 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
     $scope.tabs = {simulate: 'current', result: ''};
     $scope.panels = {simulate: 'show', result: ''};
 
+    var gui = require('nw.gui');
+
     // get worker
-    var wk = new Worker('js/algorithms/' + $scope.algo + '-worker.js'),
+    var wk = saverFactory.saver.checkWorker($scope.name) && new Worker(gui.App.dataPath + '/algorithmWorker/' + $scope.algo + '-worker.js'),
         optionPromise;
+
 
     optionPromise = new Promise(function (resolve, reject) {
         wk.postMessage({
