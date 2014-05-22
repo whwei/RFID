@@ -69,10 +69,10 @@ input:disabled {
     margin: 5px 10px;
     padding: 5px;
     border-radius: 3px;
-    border: 1px solid rgb(180, 180, 180);
-    background-color: rgb(200, 200, 200);
-    color: white;
-    text-shadow: 1px 1px 1px rgba(0,0,0,.5);
+    border: 1px solid #97c1da;
+    background-color: rgba(65, 131, 196, 0.4);
+    color: #264C72;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
     text-align: center;
 }
 .panels .invalid.show {
