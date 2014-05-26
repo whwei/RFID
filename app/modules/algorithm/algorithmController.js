@@ -33,10 +33,10 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
             command: 'getDefaultOption'
         });
 
+
         // bind worker event
         wk.addEventListener('message', function (e) {
             if (e.data.type === 'result'){
-
                 $scope.$apply(function(scope) {
                     $scope.cleanHistory = false;
                     scope.result = e.data.value;
@@ -69,17 +69,17 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
             } else if (e.data.type === 'options') {
                 $scope.$apply(function(scope) {
                     var opts = {},
-                        ret = JSON.parse(e.data.value);
+                        ret = JSON.parse(e.data.value),
+                        so = storageFactory.getItem('simulateOptionStore') || {};
 
                     for (var p in ret) {
                         if (ret.hasOwnProperty(p)) {
                             if (ret[p].optional === true) {
-                                opts[p] = ret[p];
+                                opts[p] = so[p] || ret[p];
                                 opts[p].disabled = false;
                             }
                         }
                     }
-
                     scope.options = opts;
                     scope.optionLoaded = true;
 
@@ -103,9 +103,7 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
                         scope.result.tags.map(function(v, i) {return [+v.x, +v.y, 1];}),
                         scope.cfgReaders.map(function(v, i) {return [+v.x, +v.y, 2];})
                     );
-
                 });
-
             }
 
             $scope.$apply(function(scope) {
@@ -143,6 +141,9 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
 
     $scope.simulate = function () {
         if ($scope.options && $scope.weightCheck){
+            var so = {},
+                opts = $scope.options;
+
             $scope.calculating = 'calculating-show';
 
             // run worker
@@ -154,6 +155,16 @@ algorithm.controller('algorithmController', function ($scope, $routeParams, $loc
                     requirements: $scope.requirements
                 }
             });
+
+            for (var p in opts) {
+                if (opts.hasOwnProperty(p)) {
+                    if (opts[p].cate === 'simulation') {
+                        so[p] = opts[p];
+                    }
+                }
+            }
+
+            storageFactory.setItem('simulateOptionStore', so);
         }
     };
 

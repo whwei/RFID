@@ -388,7 +388,7 @@ PSO.prototype = {
         record.run.getBestIte = 0;
         for (i = 0; i < len; i++) {
             this.status.iteration = i;
-            this.iterator(record);
+            this.iterate(record);
             if (ck && ck.call(this, record)) {
                 break;
             }
@@ -453,7 +453,7 @@ PSO.prototype = {
 
 
     },
-    iterator: function (record) {
+    iterate: function (record) {
         var i,
             j,
             sum = 0,
@@ -714,7 +714,7 @@ function distance(p1, p2) {
     }
 
     function check(n) {
-        return n >= 0 && (n <= PSO.prototype.options.xsize.value || n <= PSO.prototype.options.ysize.value);
+        return n >= 0;
     }
     return null;
 }

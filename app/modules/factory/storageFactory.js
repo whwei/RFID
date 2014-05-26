@@ -9,6 +9,6 @@ commonFactory.factory('storageFactory', function () {
     storage.initSync({
         dir: gui.App.dataPath + '/persist'
     });
-
+window.store = storage;
     return storage;
 });

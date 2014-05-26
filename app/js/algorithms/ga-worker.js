@@ -353,7 +353,7 @@ GA.prototype = {
         record.run.getBestIte = 0;
         for (i = 0; i < len; i++) {
             this.status.iteration = i;
-            this.iterator(record);
+            this.iterate(record);
             if (ck && ck.call(this, record)) {
                 break;
             }
@@ -418,7 +418,7 @@ GA.prototype = {
 
 
     },
-    iterator: function (record) {
+    iterate: function (record) {
         var i,
             j,
             population = record.population,
@@ -677,7 +677,7 @@ function distance(p1, p2) {
     }
 
     function check(n) {
-        return n >= 0 && (n <= GA.prototype.options.xsize.value || n <= GA.prototype.options.ysize.value);
+        return n >= 0;
     }
     return null;
 }

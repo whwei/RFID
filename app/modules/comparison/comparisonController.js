@@ -26,7 +26,7 @@ comparison.controller('comparisonController', function ($scope, $location, algor
                 optList[o] = it;
             }
         }
-        console.log(history[len - 1]);
+
         stores.push({
             name: v.name.toUpperCase(),
             history: history,

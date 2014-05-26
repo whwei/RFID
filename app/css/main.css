@@ -283,7 +283,6 @@ input:disabled {
 .panels .show {
     display: block;
 }
-
 .simulate {
     position: relative;
 }
@@ -342,6 +341,9 @@ input:disabled {
     color: #666;
     outline: none;
 }
+.options input:invalid {
+    border-color: red;
+}
 .options input:focus {
     border: 1px solid rgba(80, 150, 225, .5);
 }
@@ -356,7 +358,7 @@ input:disabled {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: fixed;
+    position: absolute;
     left: 0; top: 0; right: 0; bottom: 0;
     background: rgba(255, 255, 255, .75);
     opacity: 0;
