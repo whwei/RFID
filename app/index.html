@@ -21,17 +21,20 @@
         <div class="layout">
             <div class="nav-main" ng-controller="navController">
                 <ul class="list-group">
-                    <li class="list-group-title">算法</li>
-                    <!--algorithm comparison-->
-                    <li>
-                        <a href="{{ compareAlgo.url }}" class="list-group-item" ng-click="select(compareAlgo.url)" ng-class="compareAlgo.klass">{{ compareAlgo.title }}</a>
-                    </li>
+                    <li class="list-group-title">算法模拟</li>
                     <!--algorithms-->
                     <li ng-repeat="algo in algos">
                         <a href="{{ algo.url }}" class="list-group-item list-algo" ng-class="algo.klass" ng-click="select(algo.url)">{{ algo.title }}</a>
                     </li>
+
+                    <li class="list-group-title">算法对比</li>
+                    <!--algorithm comparison-->
+                    <li>
+                        <a href="{{ compareAlgo.url }}" class="list-group-item" ng-click="select(compareAlgo.url)" ng-class="compareAlgo.klass">{{ compareAlgo.title }}</a>
+                    </li>
+
                     <!--alogrithm setting-->
-                    <li class="list-group-title">算法设置</li>
+                    <li class="list-group-title">算法管理</li>
                     <li>
                         <a href="{{ addAlgo.url }}" class="list-group-item" ng-click="select(addAlgo.url)" ng-class="addAlgo.klass">{{ addAlgo.title }}</a>
                     </li>

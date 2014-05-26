@@ -19,6 +19,9 @@ nav.controller('navController', function ($scope, $location, algorithmInfoFactor
         $scope.navList.forEach(function (v, k) {
             v.klass = (v.url === url ? 'current' : '');
         });
+        if (url === '#') {
+            $scope.select('#/comparison');
+        }
     };
 
     $scope.select('#' + $location.$$path);
